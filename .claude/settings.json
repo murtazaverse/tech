@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 /tmp/claude-1000/-home-murtaza-workspace-tech/a763b281-f804-445c-a1b7-f787a0100cf9/scratchpad/patch_projects.py)",
+      "Bash(python3 /tmp/claude-1000/-home-murtaza-workspace-tech/a763b281-f804-445c-a1b7-f787a0100cf9/scratchpad/patch2.py)",
+      "Read(//home/murtaza/.cache/**)",
+      "Bash(node -e \"console.log\\(process.version\\)\")",
+      "Bash(python3 -c \"import PIL; print\\('PIL', PIL.__version__\\)\")"
+    ]
+  }
+}
