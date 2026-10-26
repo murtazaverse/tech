@@ -173,6 +173,21 @@ def run():
                 check(measurements['planets'] == 6, f'Six accessible planet links at {width}px')
                 check(measurements['fonts'], f'Local fonts loaded at {width}px')
                 check(measurements['motion'] == 'paused' and measurements['cssMotion'] == 'none', f'Reduced motion disables decoration at {width}px')
+                check(cdp.evaluate("[...document.querySelectorAll('.sparkle')].every(e=>getComputedStyle(e).animationName==='none') && getComputedStyle(document.querySelector('.planet-sphere'),'::before').animationName==='none'"), f'Reduced motion disables sparkle and surface rotation at {width}px')
+                orbit_clipping = cdp.evaluate("""(()=>{
+                  const scene=document.querySelector('.solar-scene').getBoundingClientRect(),clipped=[];
+                  document.querySelectorAll('[data-orbit-radius]').forEach(planet=>{
+                    const ellipse=document.querySelector('.orbits ellipse[rx="'+planet.dataset.orbitRadius+'"]');
+                    const bounds=planet.getBoundingClientRect(),length=ellipse.getTotalLength();
+                    for(let i=0;i<36;i++){
+                      const p=ellipse.getPointAtLength(length*i/36);
+                      const point=new DOMPoint(p.x,p.y).matrixTransform(ellipse.getScreenCTM());
+                      if(point.x-bounds.width/2<scene.left-1||point.x+bounds.width/2>scene.right+1||point.y-bounds.height/2<scene.top-1||point.y+bounds.height/2>scene.bottom+1){clipped.push(planet.getAttribute('aria-label'));break;}
+                    }
+                  });
+                  return clipped;
+                })()""")
+                check(not orbit_clipping, f'Planet targets fit throughout a complete orbit at {width}px: {orbit_clipping}')
                 network = cdp.evaluate("""(()=>{
                   const map=document.querySelector('.constellation-map').getBoundingClientRect();
                   const nodes=[...document.querySelectorAll('.constellation-node')].map(e=>({name:e.dataset.skill,rect:e.getBoundingClientRect()}));
@@ -182,6 +197,14 @@ def run():
                   return {clipped,overlapping};
                 })()""")
                 check(not network['clipped'] and not network['overlapping'], f'Skill network labels fit without overlap at {width}px: {network}')
+                routing_alignment = cdp.evaluate("""(()=>{
+                  const art=document.querySelector('.art-inference-routing');
+                  const center=selector=>{const r=art.querySelector(selector).getBoundingClientRect();return r.top+r.height/2};
+                  const ys=[center('.routing-input'),center('.routing-hub'),center('.gpu-stack>span:nth-child(2)')];
+                  const horizontal=selector=>{const p=art.querySelector(selector);return Math.abs(p.getPointAtLength(0).y-p.getPointAtLength(p.getTotalLength()).y)<.1};
+                  return Math.max(...ys)-Math.min(...ys)<1&&horizontal('.routing-wire-in')&&horizontal('.routing-wire-2')&&!art.querySelector('.routing-input span');
+                })()""")
+                check(routing_alignment, f'Request, placement, and middle GPU branch align horizontally at {width}px')
                 report['viewports'].append(measurements)
                 cdp.screenshot(f'home-{width}.png')
                 if width == 1440:
@@ -201,7 +224,7 @@ def run():
                 check(position >= 70, f'{target} destination clears the sticky header')
 
             cdp.navigate(base)
-            cdp.evaluate("document.getElementById('projects').scrollIntoView()")
+            cdp.evaluate("document.getElementById('projects').scrollIntoView({behavior:'instant'})")
             time.sleep(.2)
             check(cdp.evaluate("document.querySelector('.desktop-nav a[data-section=projects]').getAttribute('aria-current')") == 'location', 'Active navigation follows the visible section')
             cdp.screenshot('projects-desktop.png')
@@ -263,16 +286,135 @@ def run():
 
             # User control of animation, independent of system preference.
             cdp.call('Emulation.setEmulatedMedia',{'features':[{'name':'prefers-reduced-motion','value':'no-preference'}]})
+            cdp.viewport(1440)
             cdp.navigate(base)
             time.sleep(1)
             check(cdp.evaluate("!document.querySelector('.motion-toggle').hidden && getComputedStyle(document.querySelector('.planet-sphere')).animationName !== 'none'"), 'Decorative motion is enabled when permitted')
+            sample_motion = "({position:document.querySelector('.planet-project').style.translate,surface:getComputedStyle(document.querySelector('.planet-project .planet-sphere'),'::before').backgroundPosition,stars:[...document.querySelectorAll('.sparkle')].map(e=>getComputedStyle(e).opacity)})"
+            before = cdp.evaluate(sample_motion)
+            time.sleep(.65)
+            after = cdp.evaluate(sample_motion)
+            check(before['position'] != after['position'], 'Planets visibly advance along their orbital paths')
+            check(before['surface'] != after['surface'], 'Planet surface textures rotate independently')
+            check(before['stars'] != after['stars'], 'Stars sparkle with independently timed brightness')
+            bounds = cdp.evaluate("(()=>{const r=document.querySelector('.solar-scene').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()")
+            cdp.call('Input.dispatchMouseEvent',{'type':'mouseMoved',**bounds})
+            time.sleep(.06)
+            before = cdp.evaluate(sample_motion)
+            time.sleep(.2)
+            after = cdp.evaluate(sample_motion)
+            check(before['position'] == after['position'] and before['surface'] == after['surface'], 'Pointer approach pauses orbit and surface rotation')
+            cdp.call('Input.dispatchMouseEvent',{'type':'mouseMoved','x':0,'y':0})
             cdp.evaluate("document.querySelector('.motion-toggle').click()")
             check(cdp.evaluate("document.documentElement.dataset.motion === 'paused' && document.querySelector('.motion-toggle').getAttribute('aria-pressed') === 'true'"), 'Pause control stops decorative motion')
+            time.sleep(.06)
+            before = cdp.evaluate(sample_motion)
+            time.sleep(.2)
+            after = cdp.evaluate(sample_motion)
+            check(before == after, 'Pause control freezes orbital motion, rotation, and sparkles')
             cdp.navigate(base)
             check(cdp.evaluate("document.documentElement.dataset.motion") == 'paused', 'Motion preference persists across page loads')
             cdp.evaluate("document.querySelector('.motion-toggle').click()")
             cdp.evaluate("document.querySelector('.planet-project').focus()")
             check(cdp.evaluate("getComputedStyle(document.querySelector('.planet-project .planet-sphere')).animationPlayState") == 'paused', 'Planet motion stabilizes during keyboard focus')
+            time.sleep(.06)
+            before = cdp.evaluate(sample_motion)
+            time.sleep(.2)
+            after = cdp.evaluate(sample_motion)
+            check(before['position'] == after['position'] and before['surface'] == after['surface'], 'Keyboard focus freezes the orbital navigation target')
+
+            cdp.call('Input.dispatchMouseEvent',{'type':'mouseMoved','x':120,'y':450})
+            time.sleep(.25)
+            check(cdp.evaluate("(()=>{const g=document.querySelector('.cursor-glow'),m=new DOMMatrix(getComputedStyle(g).transform);return g.hasAttribute('data-active')&&getComputedStyle(g).pointerEvents==='none'&&m.m41===120&&m.m42===450&&Number(getComputedStyle(g).opacity)>.9})()"), 'Ambient light follows the cursor outside the solar scene without blocking interaction')
+            check(cdp.evaluate("getComputedStyle(document.querySelector('.solar-scene'),'::after').content === 'none'"), 'Solar scene has no rectangular cursor-glow layer')
+            bounds = cdp.evaluate("(()=>{const r=document.querySelector('.solar-scene').getBoundingClientRect();return {x:r.x+5,y:r.bottom-15}})()")
+            cdp.call('Input.dispatchMouseEvent',{'type':'mouseMoved',**bounds})
+            time.sleep(.1)
+            cdp.screenshot('cursor-glow-solar-edge.png')
+            cdp.evaluate("document.getElementById('projects').scrollIntoView()")
+            cdp.call('Input.dispatchMouseEvent',{'type':'mouseMoved','x':450,'y':600})
+            time.sleep(.15)
+            check(cdp.evaluate("(()=>{const g=document.querySelector('.cursor-glow'),m=new DOMMatrix(getComputedStyle(g).transform),r=g.parentElement.getBoundingClientRect();return g.hasAttribute('data-active')&&m.m41===450&&m.m42===600&&r.top===0&&r.height===innerHeight})()"), 'Cursor light stays aligned to the viewport after scrolling')
+            cdp.screenshot('cursor-glow-projects.png')
+            cdp.navigate(base+'/projects/data-man.html')
+            cdp.call('Input.dispatchMouseEvent',{'type':'mouseMoved','x':300,'y':450})
+            time.sleep(.25)
+            check(cdp.evaluate("document.querySelector('.cursor-glow').hasAttribute('data-active')"), 'Page-wide cursor light also works on case studies')
+            cdp.call('Input.dispatchTouchEvent',{'type':'touchStart','touchPoints':[{'x':300,'y':450}]})
+            cdp.call('Input.dispatchTouchEvent',{'type':'touchEnd','touchPoints':[]})
+            check(cdp.evaluate("!document.querySelector('.cursor-glow').hasAttribute('data-active')"), 'Touch input clears cursor decoration')
+            cdp.call('Input.dispatchMouseEvent',{'type':'mouseMoved','x':350,'y':450})
+            time.sleep(.06)
+            cdp.evaluate("document.dispatchEvent(new PointerEvent('pointerleave'))")
+            check(cdp.evaluate("!document.querySelector('.cursor-glow').hasAttribute('data-active')"), 'Cursor light clears when the pointer leaves the page')
+            cdp.navigate(base)
+
+            # Project previews animate on actual mouse hover, with no idle loop.
+            cdp.call('Emulation.setTouchEmulationEnabled',{'enabled':False})
+            for slug, selector, property_name in [
+                ('data-man','.chart-bars i','transform'),
+                ('kira','.agent-core','scale'),
+                ('patent-search','.search-lens','translate'),
+                ('inference-routing','.routing-packet-in','strokeDashoffset')
+            ]:
+                card = f"document.querySelector('.art-{slug}').closest('.project-card')"
+                cdp.evaluate(f"{card}.scrollIntoView({{behavior:'instant',block:'center'}})")
+                bounds = cdp.evaluate(f"(()=>{{const r={card}.querySelector('.project-art').getBoundingClientRect();return {{x:r.x+r.width/2,y:r.y+r.height/2}}}})()")
+                cdp.call('Input.dispatchMouseEvent',{'type':'mouseMoved',**bounds})
+                time.sleep(.1)
+                target = f"{card}.querySelector('{selector}')"
+                hover_state = cdp.evaluate(f"({{hovered:{card}.matches(':hover'),animation:getComputedStyle({target}).animationName,canHover:matchMedia('(hover:hover)').matches,focus:document.activeElement.className}})")
+                check(hover_state['hovered'] and hover_state['animation'] != 'none', f'{slug} illustration animates on mouse hover: {hover_state}')
+                before = cdp.evaluate(f"getComputedStyle({target}).{property_name}")
+                time.sleep(.25)
+                after = cdp.evaluate(f"getComputedStyle({target}).{property_name}")
+                check(before != after, f'{slug} hover produces visible animation')
+                cdp.screenshot(f'project-hover-{slug}.png')
+                if slug == 'inference-routing':
+                    stages = cdp.evaluate("""(()=>{
+                      const art=document.querySelector('.art-inference-routing');
+                      const animations=art.getAnimations({subtree:true}).filter(a=>a.animationName?.startsWith('routing-'));
+                      const read=time=>{
+                        animations.forEach(a=>{a.pause();a.currentTime=time});
+                        return {incoming:Number(getComputedStyle(art.querySelector('.routing-packet-in')).opacity),outgoing:Number(getComputedStyle(art.querySelector('.routing-packet-out')).opacity),thinking:Number(getComputedStyle(art.querySelector('.routing-thinking i')).opacity),selected:Number(art.dataset.routingTarget)-1,tiers:[...art.querySelectorAll('.gpu-stack>span')].map(e=>getComputedStyle(e).backgroundColor)};
+                      };
+                      return [read(160),read(560),read(960),read(1320)];
+                    })()""")
+                    check(stages[0]['incoming'] > .9 and stages[0]['thinking'] == 0 and stages[0]['outgoing'] == 0, 'Request reaches the placement layer before routing begins')
+                    check(stages[1]['incoming'] == 0 and stages[1]['thinking'] > .25 and stages[1]['outgoing'] == 0, 'Placement layer briefly evaluates the route')
+                    check(stages[2]['outgoing'] > .9 and stages[2]['thinking'] == 0, 'Request travels down its selected GPU branch')
+                    selected = stages[3]['selected']
+                    idle_tiers = [color for index,color in enumerate(stages[3]['tiers']) if index != selected]
+                    check(idle_tiers[0] == idle_tiers[1] and stages[3]['tiers'][selected] != idle_tiers[0], 'Only the randomly selected GPU confirms the routing decision')
+                    check(cdp.evaluate("getComputedStyle(document.querySelector('.routing-packet-in')).animationDuration") == '1.6s', 'Complete request-routing sequence takes 1.6 seconds')
+                    routes = cdp.evaluate("""(()=>{
+                      const art=document.querySelector('.art-inference-routing'),random=Math.random;
+                      try {
+                        return [0,.5,.999].map(value=>{
+                          Math.random=()=>value;
+                          art.querySelector('.routing-packet-in').dispatchEvent(new AnimationEvent('animationiteration',{animationName:'routing-arrival',bubbles:true}));
+                          const selected=Number(art.dataset.routingTarget);
+                          return {selected,highlight:[...art.querySelectorAll('.gpu-stack>span')].findIndex(e=>e.classList.contains('gpu-selected'))+1,count:art.querySelectorAll('.gpu-selected').length,pathMatches:art.querySelector('.routing-packet-out').getAttribute('d')===art.querySelector('.routing-wire-'+selected).getAttribute('d')};
+                        });
+                      } finally {Math.random=random}
+                    })()""")
+                    check([route['selected'] for route in routes] == [1,2,3], 'Every GPU can be selected on a new request cycle')
+                    check(all(route['selected'] == route['highlight'] and route['count'] == 1 and route['pathMatches'] for route in routes), 'Random routing keeps the packet path and single GPU highlight synchronized')
+                    cdp.evaluate("document.querySelector('.art-inference-routing').getAnimations({subtree:true}).filter(a=>a.animationName?.startsWith('routing-')).forEach(a=>{a.pause();a.currentTime=1320})")
+                    cdp.screenshot('project-routing-random.png')
+                cdp.call('Input.dispatchMouseEvent',{'type':'mouseMoved','x':0,'y':0})
+                time.sleep(.06)
+                check(cdp.evaluate(f"getComputedStyle({target}).animationName") == 'none', f'{slug} animation stops after pointer exit')
+
+            cdp.evaluate("document.querySelector('.project-link').focus()")
+            check(cdp.evaluate("getComputedStyle(document.querySelector('.chart-bars i')).animationName") == 'project-chart', 'Keyboard focus activates project illustration motion')
+            cdp.evaluate("document.querySelector('.motion-toggle').click()")
+            check(cdp.evaluate("getComputedStyle(document.querySelector('.chart-bars i')).animationPlayState") == 'paused', 'Motion control pauses focused project animations')
+            cdp.evaluate("document.querySelector('.motion-toggle').click()")
+            cdp.call('Emulation.setEmulatedMedia',{'features':[{'name':'prefers-reduced-motion','value':'reduce'}]})
+            check(cdp.evaluate("[...document.querySelectorAll('.project-art *')].every(e=>getComputedStyle(e).animationName==='none') && getComputedStyle(document.querySelector('.doc-front'),'::after').animationName==='none'"), 'Reduced motion disables all project preview animations')
+            cdp.call('Emulation.setEmulatedMedia',{'features':[{'name':'prefers-reduced-motion','value':'no-preference'}]})
+            cdp.navigate(base)
 
             # Animation lifecycle: hidden pages and scenes out of view pause.
             cdp.evaluate("Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});document.dispatchEvent(new Event('visibilitychange'))")
@@ -283,10 +425,11 @@ def run():
 
             cdp.call('Emulation.setEmulatedMedia',{'features':[{'name':'prefers-reduced-motion','value':'reduce'}]})
             cdp.navigate(base)
+            check(cdp.evaluate("getComputedStyle(document.querySelector('.cursor-glow')).display === 'none'"), 'Reduced motion disables the page-wide cursor effect')
             check(cdp.evaluate("document.querySelector('.contact-links a').href === 'https://www.linkedin.com/in/murtazaverse'"), 'LinkedIn destination matches verified profile')
             check(cdp.evaluate("document.querySelector('.contact-links a:nth-child(2)').href === 'https://github.com/murtazaverse'"), 'GitHub destination matches verified profile')
             check(cdp.evaluate("document.querySelector('.email-link').href === 'mailto:murtazazaidi.tech@gmail.com'"), 'Email destination matches verified profile')
-            pdf = wait_http(base+'/assets/documents/previous-resume.pdf')
+            pdf = wait_http(cdp.evaluate("document.querySelector('#resume a[download]').href"))
             check(pdf.startswith(b'%PDF'), 'Résumé action serves a real PDF')
             check(cdp.evaluate("document.querySelector('#resume a[download]').textContent.includes('previous')"), 'Earlier résumé version is clearly identified')
             check(cdp.evaluate("document.querySelectorAll('canvas').length === 0"), 'All functionality runs with WebGL disabled')
@@ -322,6 +465,12 @@ def run():
             cdp.socket.close()
         finally:
             (ARTIFACTS/'browser-report.json').write_text(json.dumps(report,indent=2))
+            if processes and processes[0].poll() is None and 'cdp' in locals():
+                try:
+                    cdp.call('Browser.close')
+                    processes[0].wait(timeout=10)
+                except (ConnectionError, OSError, RuntimeError, subprocess.TimeoutExpired):
+                    pass
             for process in reversed(processes):
                 process.terminate()
                 try:

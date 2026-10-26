@@ -65,7 +65,7 @@ class SiteChecks(unittest.TestCase):
         for project in archive['projects']:
             self.assertIn(project['href'], text)
             self.assertTrue((ROOT/project['href']).is_file())
-        self.assertTrue((ROOT/'assets/documents/previous-resume.pdf').read_bytes().startswith(b'%PDF'))
+        self.assertTrue((ROOT/'assets/documents/resume.pdf').read_bytes().startswith(b'%PDF'))
         if not (ROOT/'resume.pdf').exists() and not (ROOT/'MURTAZA_ZAIDI_RESUME.pdf').exists():
             self.assertIn('Download previous résumé', text)
             self.assertIn('existing PDF is an earlier version', text)

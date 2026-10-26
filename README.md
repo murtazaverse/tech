@@ -21,7 +21,7 @@ Open <http://localhost:8000>. The checked-in `index.html` also works with an ord
 - `templates/case-study.html`: reusable project pages, with conceptual architecture, individual contributions, design considerations, and verified outcomes.
 - `scripts/build.py`: standard-library static renderer; shared navigation, solar system, project illustrations, skill constellation, metadata, and deployment output.
 - `assets/css/universe.css`: space environment, textured CSS planets, responsive layouts, project diagrams, print styles, and reduced-motion support.
-- `assets/js/universe.js`: mobile disclosure, active-section tracking, scene-only pointer glow, focusable skill nodes, scroll reveals, and animation lifecycle controls.
+- `assets/js/universe.js`: mobile disclosure, active-section tracking, page-wide cursor glow, focusable skill nodes, scroll reveals, and animation lifecycle controls.
 - `assets/fonts/`: self-hosted Space Grotesk and DM Sans variable fonts with SIL Open Font License files.
 - `assets/img/social-preview.png`: original social-sharing card; its reproducible source is `templates/social-preview.html`.
 
@@ -29,7 +29,7 @@ Generated HTML is included for ordinary static hosting. Edit the content/templat
 
 ## Résumé and remaining assets
 
-**TODO: supply the current résumé PDF.** The existing Google Drive résumé was retrieved and inspected. It predates the supplied verified profile and contains older contact details, so it is preserved as `assets/documents/previous-resume.pdf`, explicitly labeled as an earlier version in the UI. It is not presented as the current résumé.
+**TODO: supply the current résumé PDF.** The existing Google Drive résumé was retrieved and inspected. It predates the supplied verified profile and contains older contact details, so it is preserved as `assets/documents/resume.pdf`, explicitly labeled as an earlier version in the UI. It is not presented as the current résumé.
 
 Place the current PDF at `resume.pdf` or `MURTAZA_ZAIDI_RESUME.pdf` in the repository root, then rebuild. The renderer automatically uses that file, updates the labels, and enables the current résumé download filename.
 

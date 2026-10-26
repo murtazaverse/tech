@@ -6,6 +6,7 @@
   const finePointer = matchMedia('(hover: hover) and (pointer: fine)');
   const motionButton = document.querySelector('.motion-toggle');
   let paused = false;
+  let syncOrbit = () => {};
   try { paused = localStorage.getItem('murtazaverse-motion') === 'paused'; } catch (_) { /* Storage is optional. */ }
 
   function syncMotion() {
@@ -17,6 +18,7 @@
       motionButton.setAttribute('aria-label', paused ? 'Resume decorative motion' : 'Pause decorative motion');
       motionButton.querySelector('span').textContent = paused ? '▷' : 'Ⅱ';
     }
+    syncOrbit();
   }
   syncMotion();
   reducedMotion.addEventListener('change', syncMotion);
@@ -25,7 +27,10 @@
     try { localStorage.setItem('murtazaverse-motion', paused ? 'paused' : 'running'); } catch (_) { /* Storage is optional. */ }
     syncMotion();
   });
-  function syncVisibility() { root.toggleAttribute('data-page-hidden', document.hidden); }
+  function syncVisibility() {
+    root.toggleAttribute('data-page-hidden', document.hidden);
+    syncOrbit();
+  }
   document.addEventListener('visibilitychange', syncVisibility);
   syncVisibility();
 
@@ -103,27 +108,218 @@
     if (solar) {
       const sceneObserver = new IntersectionObserver(entries => {
         solar.classList.toggle('is-offscreen', !entries[0].isIntersecting);
+        syncOrbit();
       }, { rootMargin: '50px' });
       sceneObserver.observe(solar);
     }
   }
 
-  // One requestAnimationFrame per pointer update, scoped to the solar scene.
-  const scene = document.querySelector('.solar-scene');
-  if (scene) {
-    let frame = 0;
-    scene.addEventListener('pointermove', event => {
-      if (!finePointer.matches || reducedMotion.matches || paused || frame) return;
-      frame = requestAnimationFrame(() => {
-        const bounds = scene.getBoundingClientRect();
-        scene.style.setProperty('--pointer-x', `${event.clientX - bounds.left}px`);
-        scene.style.setProperty('--pointer-y', `${event.clientY - bounds.top}px`);
-        frame = 0;
+  // One composited light follows viewport coordinates on every portfolio page.
+  // Pointer type keeps touch input free of cursor decoration, including hybrids.
+  const cursorGlow = document.querySelector('.cursor-glow');
+  if (cursorGlow) {
+    let glowFrame = 0;
+    let cursorX = 0;
+    let cursorY = 0;
+    const hideGlow = () => {
+      cancelAnimationFrame(glowFrame);
+      glowFrame = 0;
+      cursorGlow.removeAttribute('data-active');
+    };
+    document.addEventListener('pointermove', event => {
+      if (event.pointerType !== 'mouse' || reducedMotion.matches || paused || document.hidden) {
+        hideGlow();
+        return;
+      }
+      cursorX = event.clientX;
+      cursorY = event.clientY;
+      if (glowFrame) return;
+      glowFrame = requestAnimationFrame(() => {
+        glowFrame = 0;
+        if (reducedMotion.matches || paused || document.hidden) return;
+        cursorGlow.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0)`;
+        cursorGlow.setAttribute('data-active', '');
       });
     }, { passive: true });
-    scene.addEventListener('pointerleave', () => { if (frame) cancelAnimationFrame(frame); frame = 0; });
-    window.addEventListener('pagehide', () => { if (frame) cancelAnimationFrame(frame); });
+    document.addEventListener('pointerdown', event => {
+      if (event.pointerType !== 'mouse') hideGlow();
+    }, { passive: true });
+    document.addEventListener('pointerleave', hideGlow);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) hideGlow(); });
+    window.addEventListener('blur', hideGlow);
+    window.addEventListener('pagehide', hideGlow);
+    reducedMotion.addEventListener('change', hideGlow);
+    motionButton?.addEventListener('click', hideGlow);
   }
+
+  // Orbital navigation pauses locally; the ambient cursor light stays page-wide.
+  const scene = document.querySelector('.solar-scene');
+  if (scene) {
+    const solar = scene.closest('.solar');
+    const tilt = -28 * Math.PI / 180;
+    const planets = [...scene.querySelectorAll('[data-orbit-radius]')].map(element => ({
+      element,
+      radius: Number(element.dataset.orbitRadius),
+      phase: Number(element.dataset.orbitPhase) * Math.PI / 180,
+      startX: parseFloat(element.style.left) / 100,
+      startY: parseFloat(element.style.top) / 100,
+      tooltip: element.querySelector('.planet-tooltip'),
+      tooltipWidth: 0
+    }));
+    let width = 0;
+    let height = 0;
+    let orbitFrame = 0;
+    let elapsed = 0;
+    let lastTime = 0;
+    let hovering = false;
+    let touching = false;
+
+    function positionPlanets() {
+      const rotation = elapsed / 108000 * Math.PI * 2;
+      planets.forEach(planet => {
+        const angle = planet.phase + rotation;
+        const x = (300 + planet.radius * Math.cos(angle) * Math.cos(tilt)
+          - planet.radius * .65 * Math.sin(angle) * Math.sin(tilt)) / 600 * width;
+        const y = (275 + planet.radius * Math.cos(angle) * Math.sin(tilt)
+          + planet.radius * .65 * Math.sin(angle) * Math.cos(tilt)) / 550 * height;
+        planet.element.style.translate = `${x - planet.startX * width}px ${y - planet.startY * height}px`;
+        const halfTip = planet.tooltipWidth / 2;
+        const shift = Math.max(halfTip - x, Math.min(0, width - halfTip - x));
+        planet.element.style.setProperty('--tooltip-shift', `${shift}px`);
+      });
+    }
+
+    function canOrbit() {
+      return !paused && !reducedMotion.matches && !document.hidden
+        && !solar.classList.contains('is-offscreen') && !hovering && !touching
+        && !solar.contains(document.activeElement);
+    }
+
+    function orbit(time) {
+      orbitFrame = 0;
+      if (!canOrbit()) return;
+      // Pause time is excluded, so returning to the scene never causes a jump.
+      elapsed += Math.min(time - lastTime, 80);
+      lastTime = time;
+      positionPlanets();
+      orbitFrame = requestAnimationFrame(orbit);
+    }
+
+    syncOrbit = () => {
+      if (canOrbit()) {
+        if (!orbitFrame) {
+          lastTime = performance.now();
+          orbitFrame = requestAnimationFrame(orbit);
+        }
+      } else {
+        cancelAnimationFrame(orbitFrame);
+        orbitFrame = 0;
+      }
+    };
+
+    function resizeOrbit() {
+      width = scene.clientWidth;
+      height = scene.clientHeight;
+      planets.forEach(planet => { planet.tooltipWidth = planet.tooltip.offsetWidth; });
+      positionPlanets();
+    }
+    const orbitResize = 'ResizeObserver' in window ? new ResizeObserver(resizeOrbit) : null;
+    orbitResize?.observe(scene);
+    window.addEventListener('resize', resizeOrbit, { passive: true });
+    solar.addEventListener('pointerenter', event => {
+      hovering = event.pointerType === 'mouse';
+      syncOrbit();
+    });
+    solar.addEventListener('pointerleave', () => { hovering = false; syncOrbit(); });
+    solar.addEventListener('pointerdown', () => { touching = true; syncOrbit(); });
+    const releasePointer = () => { touching = false; syncOrbit(); };
+    window.addEventListener('pointerup', releasePointer);
+    window.addEventListener('pointercancel', releasePointer);
+    solar.addEventListener('focusin', () => syncOrbit());
+    solar.addEventListener('focusout', () => queueMicrotask(syncOrbit));
+    window.addEventListener('pagehide', () => {
+      cancelAnimationFrame(orbitFrame);
+      orbitFrame = 0;
+    });
+    window.addEventListener('pageshow', () => { resizeOrbit(); syncOrbit(); });
+    resizeOrbit();
+    syncOrbit();
+
+    scene.addEventListener('pointermove', event => {
+      if (event.pointerType === 'mouse' && !hovering) { hovering = true; syncOrbit(); }
+    }, { passive: true });
+  }
+
+  // The middle GPU defines a common horizontal axis. CSS handles the short
+  // timeline; a fresh random destination is selected at each request boundary.
+  document.querySelectorAll('.art-inference-routing').forEach(art => {
+    const wires = art.querySelector('.routing-wires');
+    if (!wires) return;
+    const gpuNodes = [...art.querySelectorAll('.gpu-stack>span')];
+    const outgoingPacket = art.querySelector('.routing-packet-out');
+    const incomingPacket = art.querySelector('.routing-packet-in');
+    const card = art.closest('.project-card');
+    let selectedIndex = 0;
+    let exploring = false;
+    let paths = [];
+
+    const chooseRoute = () => {
+      selectedIndex = Math.floor(Math.random() * gpuNodes.length);
+      art.dataset.routingTarget = String(selectedIndex + 1);
+      gpuNodes.forEach((node, index) => node.classList.toggle('gpu-selected', index === selectedIndex));
+      if (paths[selectedIndex]) outgoingPacket.setAttribute('d', paths[selectedIndex]);
+    };
+    const drawRoutes = () => {
+      const bounds = art.getBoundingClientRect();
+      const origin = {left:bounds.left + art.clientLeft,top:bounds.top + art.clientTop,width:art.clientWidth,height:art.clientHeight};
+      if (!origin.width || !origin.height) return;
+      const inputNode = art.querySelector('.routing-input');
+      const hubNode = art.querySelector('.routing-hub');
+      const input = inputNode.getBoundingClientRect();
+      const hub = hubNode.getBoundingClientRect();
+      const gpus = gpuNodes.map(node => node.getBoundingClientRect());
+      const middleY = gpus[1].top + gpus[1].height / 2 - origin.top;
+      inputNode.style.top = `${middleY - input.height / 2}px`;
+      hubNode.style.top = `${middleY - hub.height / 2}px`;
+      const startX = input.right - origin.left + 6;
+      const hubLeft = hub.left - origin.left;
+      const hubRight = hub.right - origin.left;
+      const inbound = `M${startX} ${middleY} H${hubLeft}`;
+      wires.setAttribute('viewBox', `0 0 ${origin.width} ${origin.height}`);
+      art.querySelector('.routing-wire-in').setAttribute('d', inbound);
+      incomingPacket.setAttribute('d', inbound);
+      paths = gpus.map((gpu, index) => {
+        const endX = gpu.left - origin.left;
+        const endY = gpu.top + gpu.height / 2 - origin.top;
+        const branchX = hubRight + (endX - hubRight) * .64;
+        const path = index === 1 ? `M${hubRight} ${middleY} H${endX}`
+          : `M${hubRight} ${middleY} H${branchX} V${endY} H${endX}`;
+        art.querySelector(`.routing-wire-${index + 1}`).setAttribute('d', path);
+        return path;
+      });
+      outgoingPacket.setAttribute('d', paths[selectedIndex]);
+    };
+
+    if (card) {
+      const syncExploration = () => {
+        const active = card.matches(':hover') || card.contains(document.activeElement);
+        if (active && !exploring) chooseRoute();
+        exploring = active;
+      };
+      card.addEventListener('pointerenter', syncExploration);
+      card.addEventListener('pointerleave', syncExploration);
+      card.addEventListener('focusin', syncExploration);
+      card.addEventListener('focusout', () => queueMicrotask(syncExploration));
+      incomingPacket.addEventListener('animationiteration', event => {
+        if (event.animationName === 'routing-arrival' && exploring) chooseRoute();
+      });
+      syncExploration();
+    }
+    if ('ResizeObserver' in window) new ResizeObserver(drawRoutes).observe(art);
+    else window.addEventListener('resize', drawRoutes, { passive: true });
+    document.fonts.ready.then(drawRoutes);
+    drawRoutes();
+  });
 
   const description = document.getElementById('skill-description');
   const skillNodes = [...document.querySelectorAll('.constellation-node')];

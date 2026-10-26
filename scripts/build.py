@@ -3,6 +3,7 @@
 import argparse
 import html
 import json
+import math
 import os
 from pathlib import Path
 import shutil
@@ -31,7 +32,7 @@ def resume(prefix=''):
     for name in ('resume.pdf', 'MURTAZA_ZAIDI_RESUME.pdf'):
         if (ROOT / name).exists():
             return prefix + name, True
-    return prefix + 'assets/documents/previous-resume.pdf', False
+    return prefix + 'assets/documents/resume.pdf', False
 
 
 def header(prefix='', home=True):
@@ -76,13 +77,31 @@ PLANETS = [
 ]
 
 
+def sparkles():
+    stars = [(7,12,5.7,-2.1),(18,76,7.3,-5.4),(29,8,6.1,-.8),(36,58,8.7,-4.2),
+             (45,28,4.9,-3.7),(53,86,7.9,-1.6),(61,12,6.7,-5.8),(67,52,9.1,-2.9),
+             (75,79,5.3,-4.6),(82,18,8.1,-6.3),(91,39,6.3,-1.2),(96,89,7.1,-3.4)]
+    return '<div class="star-sparkles">' + ''.join(
+        f'<span class="sparkle" style="--x:{x}%;--y:{y}%;--sparkle-duration:{duration}s;--sparkle-delay:{delay}s"></span>'
+        for x,y,duration,delay in stars) + '</div>'
+
+
 def solar():
-    links = ''.join(f'''<a class="planet planet-{kind}" href="#{target}" aria-label="{label}: go to {target}"><span class="planet-sphere" aria-hidden="true"></span><span class="planet-label">{label}</span><span class="planet-tooltip" aria-hidden="true">{e(tip)}</span></a>''' for kind,label,target,tip in PLANETS)
+    tracks = {'origin':(248,240), 'career':(215,300), 'project':(232,0),
+              'tech':(248,60), 'academic':(215,120), 'signal':(232,180)}
+    tilt = math.radians(-28)
+    links = []
+    for kind,label,target,tip in PLANETS:
+        radius, phase = tracks[kind]
+        angle = math.radians(phase)
+        x = 300 + radius * math.cos(angle) * math.cos(tilt) - radius * .65 * math.sin(angle) * math.sin(tilt)
+        y = 275 + radius * math.cos(angle) * math.sin(tilt) + radius * .65 * math.sin(angle) * math.cos(tilt)
+        links.append(f'''<a class="planet planet-{kind}" href="#{target}" style="left:{x/6:.5f}%;top:{y/5.5:.5f}%" data-orbit-radius="{radius}" data-orbit-phase="{phase}" aria-label="{label}: go to {target}"><span class="planet-sphere" aria-hidden="true"></span><span class="planet-label">{label}</span><span class="planet-tooltip" aria-hidden="true">{e(tip)}</span></a>''')
     return f'''<div class="solar" aria-label="Explore Murtazaverse through six planetary navigation links">
       <div class="scene-top"><span class="mono">A LITTLE UNIVERSE, BUILT WITH CURIOSITY</span><button class="motion-toggle" type="button" aria-pressed="false" aria-label="Pause decorative motion" hidden><span aria-hidden="true">Ⅱ</span></button></div>
       <div class="solar-scene"><div class="scene-halo" aria-hidden="true"></div>
-      <svg class="orbits" viewBox="0 0 600 550" fill="none" aria-hidden="true"><g transform="rotate(-28 300 275)"><ellipse cx="300" cy="275" rx="256" ry="170"/><ellipse cx="300" cy="275" rx="197" ry="126"/><ellipse cx="300" cy="275" rx="126" ry="80"/><ellipse class="orbit-dashed" cx="300" cy="275" rx="280" ry="190"/></g><g class="orbit-dots"><circle cx="101" cy="340" r="2"/><circle cx="405" cy="103" r="2"/><circle cx="493" cy="357" r="2"/><path d="M533 149v10m-5-5h10M91 180v8m-4-4h8M388 452v8m-4-4h8"/></g></svg>
-      <a class="sun" href="#about" aria-label="Meet Murtaza"><span class="sun-surface" aria-hidden="true">m<span>✳</span></span></a>{links}
+      <svg class="orbits" viewBox="0 0 600 550" fill="none" aria-hidden="true"><g transform="rotate(-28 300 275)"><ellipse cx="300" cy="275" rx="248" ry="161.2"/><ellipse cx="300" cy="275" rx="232" ry="150.8"/><ellipse cx="300" cy="275" rx="215" ry="139.75"/><ellipse class="orbit-dashed" cx="300" cy="275" rx="270" ry="180"/></g><g class="orbit-dots"><circle cx="101" cy="340" r="2"/><circle cx="405" cy="103" r="2"/><circle cx="493" cy="357" r="2"/><path d="M533 149v10m-5-5h10M91 180v8m-4-4h8M388 452v8m-4-4h8"/></g></svg>
+      <a class="sun" href="#about" aria-label="Meet Murtaza"><span class="sun-surface" aria-hidden="true">m<span>✳</span></span></a>{''.join(links)}
       </div><p class="scene-caption"><span class="tiny-star" aria-hidden="true">✧</span> Six destinations. One curious engineer. <span class="caption-hint">Pick a planet ↗</span></p></div>'''
 
 
@@ -103,7 +122,7 @@ def art(project, large=False):
     elif slug == 'patent-search':
         body = '<div class="patent-doc doc-back"><i></i><i></i><i></i></div><div class="patent-doc doc-front"><span>Patent evidence</span><i></i><i class="highlight"></i><i></i><i class="highlight short"></i><i></i><div class="doc-check">✓ &nbsp; Structured output</div></div><div class="search-lens"></div><span class="art-caption">FROM TECHNICAL DOCUMENTS TO EVIDENCE</span>'
     else:
-        body = '<div class="routing-input">LLM requests <span>→</span></div><div class="routing-hub">Placement<br><b>layer</b></div><div class="gpu-stack"><span><i></i> GPU tier 01</span><span><i></i> GPU tier 02</span><span><i></i> GPU tier 03</span></div><span class="research-label">↗ Research in progress</span><span class="art-caption">LATENCY · FINANCIAL COST · ENERGY</span>'
+        body = '<svg class="routing-wires" viewBox="0 0 600 240" fill="none"><path class="routing-wire routing-wire-in" d="M150 110H214"/><path class="routing-wire routing-wire-1" d="M302 110H385V57H430"/><path class="routing-wire routing-wire-2" d="M302 110H385V101H430"/><path class="routing-wire routing-wire-3" d="M302 110H385V145H430"/><path class="routing-packet routing-packet-in" pathLength="100" d="M150 110H214"/><path class="routing-packet routing-packet-out" pathLength="100" d="M302 110H385V145H430"/></svg><div class="routing-input">LLM requests</div><div class="routing-hub">Placement<br><b>layer</b><span class="routing-thinking"><i></i><i></i><i></i></span></div><div class="gpu-stack"><span><i></i> GPU tier 01</span><span><i></i> GPU tier 02</span><span><i></i> GPU tier 03</span></div><span class="research-label">↗ Research in progress</span><span class="art-caption">LATENCY · FINANCIAL COST · ENERGY</span>'
     return f'<div class="project-art art-{slug} {"art-large" if large else ""}" aria-hidden="true">{body}</div>'
 
 
@@ -149,12 +168,12 @@ def build():
     title = 'Murtaza | AI & Software Engineer — Murtazaverse'
     desc = 'Explore Murtazaverse, the interactive portfolio of Murtaza, an AI and Software Engineer building AI agents, reliable backends, and data-driven products.'
     profile_schema = {'@context':'https://schema.org','@type':'Person','name':P['name'],'jobTitle':P['role'],'email':P['email'],'sameAs':[P['github'],P['linkedin']],'homeLocation':{'@type':'Place','name':P['location']}}
-    index = render('index.html',head=head(title,desc),header=header(),footer=footer(),solar=solar(),experience=experience(),projects=projects(),skills=skills(),constellation=constellation(),education=education(),archived=archived,certifications=certs,email=e(P['email']),phone=e(P['phone']),phone_tel=e(P['phone'].replace(' ','')),github=e(P['github']),linkedin=e(P['linkedin']),location=e(P['location']),resume_url=e(resume_url),resume_text=e(resume_text),resume_label=e(resume_label),resume_filename='MURTAZA_ZAIDI_RESUME.pdf' if current_resume else 'MURTAZA_ZAIDI_PREVIOUS_RESUME.pdf',profile_schema=json.dumps(profile_schema).replace('<','\\u003c'))
+    index = render('index.html',head=head(title,desc),header=header(),footer=footer(),sparkles=sparkles(),solar=solar(),experience=experience(),projects=projects(),skills=skills(),constellation=constellation(),education=education(),archived=archived,certifications=certs,email=e(P['email']),phone=e(P['phone']),phone_tel=e(P['phone'].replace(' ','')),github=e(P['github']),linkedin=e(P['linkedin']),location=e(P['location']),resume_url=e(resume_url),resume_text=e(resume_text),resume_label=e(resume_label),resume_filename='MURTAZA_ZAIDI_RESUME.pdf' if current_resume else 'MURTAZA_ZAIDI_PREVIOUS_RESUME.pdf',profile_schema=json.dumps(profile_schema).replace('<','\\u003c'))
     (ROOT / 'index.html').write_text(index)
     for i, p in enumerate(DATA['projects']):
         next_p = DATA['projects'][(i+1) % len(DATA['projects'])]
         flow = '<ol class="architecture-flow">'+''.join('<li>'+e(x)+'</li>' for x in p['flow'])+'</ol>'
-        body = render('case-study.html',head=head(p['name']+' — Murtazaverse',p['description'],'../','projects/'+p['slug']+'.html'),header=header('../',False),footer=footer('../',False),name=e(p['name']),subtitle=e(p['subtitle']),project_type=e(p['type']),status=e(p['status']),description=e(p['description']),art=art(p,True),problem=e(p['problem']),solution=e(p['solution']),contributions=''.join('<li>'+e(x)+'</li>' for x in p['contributions']),flow=flow,considerations=''.join('<li>'+e(x)+'</li>' for x in p['considerations']),outcome=e(p['outcome']),stack=tags(p['stack']),next_url=next_p['slug']+'.html',next_name=e(next_p['name']),color=p['color'],work_note='<p class="case-note">Professional work. This case study describes my contributions at a high level; internal code and implementation details are not shared.</p>' if 'Professional' in p['type'] else '')
+        body = render('case-study.html',head=head(p['name']+' — Murtazaverse',p['description'],'../','projects/'+p['slug']+'.html'),header=header('../',False),footer=footer('../',False),sparkles=sparkles(),name=e(p['name']),subtitle=e(p['subtitle']),project_type=e(p['type']),status=e(p['status']),description=e(p['description']),art=art(p,True),problem=e(p['problem']),solution=e(p['solution']),contributions=''.join('<li>'+e(x)+'</li>' for x in p['contributions']),flow=flow,considerations=''.join('<li>'+e(x)+'</li>' for x in p['considerations']),outcome=e(p['outcome']),stack=tags(p['stack']),next_url=next_p['slug']+'.html',next_name=e(next_p['name']),color=p['color'],work_note='<p class="case-note">Professional work. This case study describes my contributions at a high level; internal code and implementation details are not shared.</p>' if 'Professional' in p['type'] else '')
         (ROOT / 'projects' / (p['slug']+'.html')).write_text(body)
     domain = os.environ.get('MURTAZAVERSE_SITE_URL','').rstrip('/')
     robots = 'User-agent: *\nAllow: /\n'

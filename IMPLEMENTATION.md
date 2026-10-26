@@ -9,7 +9,7 @@ The redesign replaces the homepage and adds dedicated universe assets, while ret
 ## Implementation choices
 
 - Retain the static stack. Introducing React, Three.js, and a dependency pipeline solely for navigation would add considerable complexity to this repository. Layered gradients, SVG orbital paths, and native links produce a dimensional miniature solar system that does not require WebGL.
-- Keep targets stationary. Slow surface drift and glow convey atmosphere; the six large anchors stay easy to click, tap, or focus. All scene animation pauses during hover/focus, and offscreen/hidden-page animation is suspended.
+- Use three tilted orbital paths with a shared 108-second clock to keep planets spaced. Surface textures rotate independently. Large native anchors remain upright, and orbital motion pauses during pointer approach, touch, keyboard focus, and offscreen/hidden-page states. Paused time is excluded so resuming does not jump forward. Reduced-motion users receive a static scene.
 - Render important content as HTML at build time, keeping profile content in JSON. Core content and conventional navigation also work without JavaScript.
 - Use real project pages instead of modals, preserving history, deep links, and ordinary keyboard behavior.
 - Keep employer and independent projects distinct. Diagrams are conceptual and derived from the supplied descriptions; engineering considerations are framed as tradeoffs rather than unsupported implementation claims.

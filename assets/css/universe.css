@@ -196,6 +196,40 @@ a:hover {
   transform:rotate(-12deg)
 }
 
+/* A circular viewport light, with transparent edges well
+   inside its layer. It never inherits the solar scene's rectangular bounds. */
+.ambient-light {
+  position:fixed;
+  inset:0;
+  overflow:hidden;
+  pointer-events:none;
+  z-index:50
+}
+
+.cursor-glow {
+  position:absolute;
+  left:0;
+  top:0;
+  width:240px;
+  height:240px;
+  margin:-120px;
+  border-radius:50%;
+  background:radial-gradient(circle closest-side,#bba8f116 0%,#8fd9e809 35%,transparent 75%);
+  transform:translate3d(-1000px,-1000px,0);
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .2s;
+  will-change:transform
+}
+
+.cursor-glow[data-active] {
+  opacity:1
+}
+
+html[data-motion=paused] .cursor-glow,html[data-page-hidden] .cursor-glow {
+  opacity:0
+}
+
 .starfield {
   position:absolute;
   inset:0;
@@ -214,6 +248,49 @@ a:hover {
   background-size:477px 537px;
   opacity:.6;
   animation:twinkle 14s -7s ease-in-out infinite alternate
+}
+
+.star-sparkles {
+  position:absolute;
+  inset:0
+}
+
+.sparkle {
+  position:absolute;
+  left:var(--x);
+  top:var(--y);
+  width:2px;
+  height:2px;
+  border-radius:50%;
+  background:#e8e5ff;
+  opacity:.2;
+  box-shadow:0 0 7px #c9c7ff66;
+  animation:star-sparkle var(--sparkle-duration) var(--sparkle-delay) ease-in-out infinite
+}
+
+.sparkle:before,.sparkle:after {
+  content:'';
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:9px;
+  height:1px;
+  transform:translate(-50%,-50%);
+  background:linear-gradient(90deg,transparent,#e1ddffb3,transparent)
+}
+
+.sparkle:after {
+  transform:translate(-50%,-50%) rotate(90deg)
+}
+
+@keyframes star-sparkle {
+  0%,35%,100% {opacity:.12;transform:scale(.65)}
+  48% {opacity:.9;transform:scale(1.2)}
+  62% {opacity:.25;transform:scale(.8)}
+}
+
+@media(max-width:760px) {
+  .sparkle:nth-child(n+9) {display:none}
 }
 
 .shooting-star {
@@ -536,13 +613,12 @@ a:hover {
   letter-spacing:1px
 }
 
-/* The six planets keep their positions. Only their surfaces drift. */
+/* A shared orbital clock keeps the six targets spaced; surface rotation is independent. */
 .solar {
   min-width:0;
   align-self:center;
   position:relative;
-  margin-right:-16px;
-  isolation:isolate
+  margin-right:-16px
 }
 
 .scene-top {
@@ -580,9 +656,7 @@ a:hover {
 .solar-scene {
   aspect-ratio:600/550;
   position:relative;
-  max-width:630px;
-  --pointer-x:50%;
-  --pointer-y:50%
+  max-width:630px
 }
 
 .scene-halo {
@@ -590,17 +664,6 @@ a:hover {
   inset:6%;
   border-radius:50%;
   background:radial-gradient(ellipse,#8e68941a,transparent 64%)
-}
-
-.solar-scene:after {
-  content:'';
-  position:absolute;
-  inset:0;
-  z-index:-1;
-  pointer-events:none;
-  background:radial-gradient(110px circle at var(--pointer-x) var(--pointer-y),#bba8f10b,transparent);
-  opacity:0;
-  transition:opacity .3s
 }
 
 .orbits {
@@ -705,7 +768,10 @@ a:hover {
   min-height:74px;
   padding:8px 0;
   color:var(--muted);
-  --planet-color:var(--cyan)
+  --planet-color:var(--cyan);
+  --spin-duration:42s;
+  --spin-delay:-7s;
+  will-change:translate
 }
 
 .planet-sphere {
@@ -725,8 +791,12 @@ a:hover {
   position:absolute;
   inset:0;
   border-radius:50%;
-  background:repeating-linear-gradient(168deg,transparent 0 7%,#ffffff15 8%,transparent 12%,#00000017 17%,transparent 23%);
-  opacity:.7
+  background-image:radial-gradient(ellipse at 23% 34%,#ffffff29 0 8%,transparent 12%),radial-gradient(ellipse at 73% 65%,#00000021 0 10%,transparent 15%),repeating-linear-gradient(168deg,transparent 0 7%,#ffffff15 8%,transparent 12%,#00000017 17%,transparent 23%);
+  background-size:200% 100%;
+  background-repeat:repeat-x;
+  opacity:.7;
+  animation:planet-spin var(--spin-duration) var(--spin-delay) linear infinite;
+  animation-play-state:inherit
 }
 
 .planet-label {
@@ -745,7 +815,7 @@ a:hover {
   bottom:calc(100% + 7px);
   left:50%;
   width:175px;
-  transform:translate(-50%,4px);
+  transform:translate(calc(-50% + var(--tooltip-shift,0px)),4px);
   text-align:center;
   border:1px solid #ffffff21;
   background:#141b2ff5;
@@ -779,7 +849,7 @@ a:hover {
 .planet:hover .planet-tooltip,.planet:focus-visible .planet-tooltip {
   opacity:1;
   visibility:visible;
-  transform:translate(-50%,0)
+  transform:translate(calc(-50% + var(--tooltip-shift,0px)),0)
 }
 
 .planet:active .planet-sphere {
@@ -790,7 +860,8 @@ a:hover {
   left:16%;
   top:35%;
   --size:36px;
-  --planet-color:#83c7b5
+  --planet-color:#83c7b5;
+  --spin-duration:38s
 }
 
 .planet-origin .planet-sphere {
@@ -801,7 +872,9 @@ a:hover {
   left:39%;
   top:16%;
   --size:45px;
-  --planet-color:var(--peach)
+  --planet-color:var(--peach);
+  --spin-duration:45s;
+  --spin-delay:-19s
 }
 
 .planet-career .planet-sphere {
@@ -813,7 +886,9 @@ a:hover {
   left:78%;
   top:31%;
   --size:65px;
-  --planet-color:var(--lavender)
+  --planet-color:var(--lavender);
+  --spin-duration:58s;
+  --spin-delay:-31s
 }
 
 .planet-project .planet-sphere {
@@ -836,7 +911,9 @@ a:hover {
   left:87%;
   top:66%;
   --size:37px;
-  --planet-color:var(--cyan)
+  --planet-color:var(--cyan);
+  --spin-duration:36s;
+  --spin-delay:-23s
 }
 
 .planet-tech .planet-sphere {
@@ -844,21 +921,13 @@ a:hover {
   animation-delay:-8s
 }
 
-.planet-tech .planet-tooltip {
-  left:auto;
-  right:0;
-  transform:translate(0,4px)
-}
-
-.planet-tech:hover .planet-tooltip,.planet-tech:focus-visible .planet-tooltip {
-  transform:translate(0,0)
-}
-
 .planet-academic {
   left:48%;
   top:83%;
   --size:39px;
-  --planet-color:#c3c69c
+  --planet-color:#c3c69c;
+  --spin-duration:51s;
+  --spin-delay:-11s
 }
 
 .planet-academic .planet-sphere {
@@ -870,7 +939,9 @@ a:hover {
   left:21%;
   top:71%;
   --size:29px;
-  --planet-color:var(--cyan)
+  --planet-color:var(--cyan);
+  --spin-duration:29s;
+  --spin-delay:-17s
 }
 
 .planet-signal .planet-sphere {
@@ -905,6 +976,10 @@ a:hover {
 
 }
 
+@keyframes planet-spin {
+  to {background-position:200% 0}
+}
+
 @keyframes sun-breathe {
   to {
     filter:brightness(1.06)
@@ -914,13 +989,6 @@ a:hover {
 
 .solar:hover *,.solar:focus-within * {
   animation-play-state:paused!important
-}
-
-@media(hover:hover) and (pointer:fine) {
-  .solar-scene:hover:after {
-    opacity:1
-  }
-
 }
 
 .proof-strip {
@@ -1692,6 +1760,62 @@ a:hover {
   color:#acbdb4
 }
 
+.art-inference-routing {
+  --routing-duration:1.6s
+}
+
+.routing-wires {
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  pointer-events:none
+}
+
+.routing-wire,.routing-packet {
+  vector-effect:non-scaling-stroke;
+  stroke-linecap:round
+}
+
+.routing-wire {
+  stroke:#b6d3b72e;
+  stroke-width:1
+}
+
+.routing-packet {
+  stroke:#c6efd0;
+  stroke-width:3;
+  stroke-dasharray:8 100;
+  stroke-dashoffset:8;
+  opacity:0
+}
+
+.routing-thinking {
+  position:absolute;
+  bottom:5px;
+  left:50%;
+  translate:-50% 0;
+  display:flex;
+  gap:3px
+}
+
+.routing-thinking i {
+  width:3px;
+  height:3px;
+  border-radius:50%;
+  background:var(--mint);
+  opacity:0
+}
+
+.art-inference-routing .gpu-stack:before,
+.art-inference-routing .gpu-stack:after {
+  content:none
+}
+
+.project-card:hover .art-inference-routing>div {
+  translate:none
+}
+
 .gpu-stack {
   position:absolute;
   right:9%;
@@ -1750,6 +1874,158 @@ a:hover {
   padding:3px 6px;
   border-radius:4px;
   font-size:7px
+}
+
+/* Each miniature system comes alive only while its card is being explored. */
+.project-card .doc-front:after {
+  content:'';
+  position:absolute;
+  top:25px;
+  left:10px;
+  right:10px;
+  height:30px;
+  background:linear-gradient(transparent,#94d5e325);
+  border-bottom:1px solid #94d5e380;
+  opacity:0;
+  pointer-events:none
+}
+
+@media(prefers-reduced-motion:no-preference) {
+  .project-card:is(:hover,:focus-within) .chart-bars i {
+    transform-origin:bottom;
+    animation:project-chart 1.7s ease-in-out infinite
+  }
+
+  .project-card:is(:hover,:focus-within) .chart-bars i:nth-child(3n+1) {
+    animation-delay:-.55s
+  }
+
+  .project-card:is(:hover,:focus-within) .chart-bars i:nth-child(3n+2) {
+    animation-delay:-1.1s
+  }
+
+  .project-card:is(:hover,:focus-within) .data-flow>i {
+    animation:project-request 1.7s ease-in-out infinite
+  }
+
+  .project-card:is(:hover,:focus-within) .data-flow>i:last-of-type {
+    animation-delay:-.8s
+  }
+
+  .project-card:is(:hover,:focus-within) .agent-core {
+    animation:project-agent 2.2s ease-in-out infinite
+  }
+
+  .project-card:is(:hover,:focus-within) .agent-node {
+    animation:project-agent-signal 2.2s ease-in-out infinite
+  }
+
+  .project-card:is(:hover,:focus-within) .node-b {
+    animation-delay:-.7s
+  }
+
+  .project-card:is(:hover,:focus-within) .node-c {
+    animation-delay:-1.4s
+  }
+
+  .project-card:is(:hover,:focus-within) .doc-front:after {
+    animation:project-scan 2.4s ease-in-out infinite
+  }
+
+  .project-card:is(:hover,:focus-within) .search-lens {
+    animation:project-search 2.4s ease-in-out infinite
+  }
+
+  .project-card:is(:hover,:focus-within) .routing-packet-in {
+    animation:routing-arrival var(--routing-duration) linear infinite
+  }
+
+  .project-card:is(:hover,:focus-within) .routing-hub {
+    animation:routing-think var(--routing-duration) ease-in-out infinite
+  }
+
+  .project-card:is(:hover,:focus-within) .routing-thinking i {
+    animation:routing-dots var(--routing-duration) linear infinite
+  }
+
+  .project-card:is(:hover,:focus-within) .routing-thinking i:nth-child(2) {
+    animation-delay:.04s
+  }
+
+  .project-card:is(:hover,:focus-within) .routing-thinking i:nth-child(3) {
+    animation-delay:.08s
+  }
+
+  .project-card:is(:hover,:focus-within) .routing-packet-out {
+    animation:routing-dispatch var(--routing-duration) linear infinite
+  }
+
+  .project-card:is(:hover,:focus-within) .gpu-selected {
+    animation:routing-selected var(--routing-duration) ease-out infinite
+  }
+
+  @keyframes project-chart {
+    0%,100% {transform:scaleY(1)}
+    35% {transform:scaleY(.72)}
+    70% {transform:scaleY(1.14)}
+  }
+
+  @keyframes project-request {
+    0%,100% {translate:0 0;opacity:.45}
+    50% {translate:3px 0;opacity:1}
+  }
+
+  @keyframes project-agent {
+    0%,100% {scale:1;box-shadow:0 0 25px #edb39408}
+    50% {scale:1.035;box-shadow:0 0 38px #edb39422}
+  }
+
+  @keyframes project-agent-signal {
+    0%,100% {border-color:#edb39424;background:#1c1e2a}
+    45% {border-color:#edb39480;background:#30262e}
+  }
+
+  @keyframes project-scan {
+    0% {translate:0 0;opacity:0}
+    15% {opacity:1}
+    80% {translate:0 85px;opacity:1}
+    100% {translate:0 85px;opacity:0}
+  }
+
+  @keyframes project-search {
+    0%,100% {translate:0 -3px}
+    50% {translate:-5px 2px}
+  }
+
+  @keyframes routing-arrival {
+    0% {stroke-dashoffset:8;opacity:0}
+    3% {opacity:1}
+    24% {stroke-dashoffset:-100;opacity:1}
+    26%,100% {stroke-dashoffset:-100;opacity:0}
+  }
+
+  @keyframes routing-think {
+    0%,24%,53%,100% {border-color:#b6d3b73d;box-shadow:0 0 0 #b6d3b700}
+    32%,44% {border-color:#c6efd0a6;box-shadow:0 0 18px #b6d3b729}
+  }
+
+  @keyframes routing-dots {
+    0%,25%,51%,100% {opacity:0}
+    31%,44% {opacity:1}
+    37% {opacity:.25}
+  }
+
+  @keyframes routing-dispatch {
+    0%,49% {stroke-dashoffset:8;opacity:0}
+    51% {opacity:1}
+    74% {stroke-dashoffset:-100;opacity:1}
+    76%,100% {stroke-dashoffset:-100;opacity:0}
+  }
+
+  @keyframes routing-selected {
+    0%,73%,100% {background:#172328;border-color:#b6d3b724;box-shadow:0 0 0 #b6d3b700}
+    77%,94% {background:#304c3c;border-color:#c6efd0b3;box-shadow:0 0 16px #b6d3b724}
+  }
 }
 
 .skills-layout {
@@ -4008,7 +4284,7 @@ html[data-motion=paused] .shooting-star {
   }
 
   .planet {
-    width:24%;
+    width:22%;
     min-height:65px
   }
 
@@ -4309,14 +4585,14 @@ html[data-motion=paused] .shooting-star {
     transform:none
   }
 
-  .solar-scene:after {
+  .cursor-glow {
     display:none
   }
 
 }
 
 @media print {
-  .cosmic-background,.site-header,.solar,.contact-orbit,.hero-bottom,.constellation,.project-art,.menu-toggle,.hero-actions,.site-footer {
+  .cosmic-background,.ambient-light,.site-header,.solar,.contact-orbit,.hero-bottom,.constellation,.project-art,.menu-toggle,.hero-actions,.site-footer {
     display:none!important
   }
 
