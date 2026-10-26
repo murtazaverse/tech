@@ -24,6 +24,7 @@ Open <http://localhost:8000>. The checked-in `index.html` also works with an ord
 - `assets/js/universe.js`: mobile disclosure, active-section tracking, page-wide cursor glow, focusable skill nodes, scroll reveals, and animation lifecycle controls.
 - `assets/fonts/`: self-hosted Space Grotesk and DM Sans variable fonts with SIL Open Font License files.
 - `assets/img/social-preview.png`: original social-sharing card; its reproducible source is `templates/social-preview.html`.
+- `assets/img/background/`: the ESO Milky Way panorama, asteroids, and locally stored NASA planet photographs. Sources and credits are in `CREDITS.md`, with a visible Milky Way credit in every footer. Scrolling reveals Saturn on the left, Earth in the center, Mars on the left, and Pluto on the right. Small vector rockets, satellites, and UFOs drift in the background; only powered craft have exhaust. Mobile layouts show one of each craft. Reduced motion disables parallax and exhaust, and the motion control freezes all decoration.
 
 Generated HTML is included for ordinary static hosting. Edit the content/templates rather than the generated pages. The existing project pages, their shared CSS/JavaScript, images, and other assets are preserved.
 

@@ -7,6 +7,7 @@
   const motionButton = document.querySelector('.motion-toggle');
   let paused = false;
   let syncOrbit = () => {};
+  let syncSpaceTravel = () => {};
   try { paused = localStorage.getItem('murtazaverse-motion') === 'paused'; } catch (_) { /* Storage is optional. */ }
 
   function syncMotion() {
@@ -19,6 +20,7 @@
       motionButton.querySelector('span').textContent = paused ? '▷' : 'Ⅱ';
     }
     syncOrbit();
+    syncSpaceTravel();
   }
   syncMotion();
   reducedMotion.addEventListener('change', syncMotion);
@@ -30,6 +32,7 @@
   function syncVisibility() {
     root.toggleAttribute('data-page-hidden', document.hidden);
     syncOrbit();
+    syncSpaceTravel();
   }
   document.addEventListener('visibilitychange', syncVisibility);
   syncVisibility();
@@ -95,6 +98,7 @@
   }
   function updateNavigation() {
     navigationFrame = 0;
+    syncSpaceTravel();
     if (!navigationSections.length) {
       setActiveSection(document.body.classList.contains('case-page') ? 'projects' : 'home');
       return;
@@ -130,6 +134,41 @@
   document.fonts.ready.then(measureNavigation);
   measureNavigation();
   updateNavigation();
+
+  // Scroll reveals four quiet encounters at different depths. Text stays in
+  // normal flow; the background shares the existing scroll animation frame.
+  const universe = document.querySelector('.cosmic-background');
+  if (universe) {
+    const encounters = [
+      {node:universe.querySelector('[data-world=saturn]'),start:.035,end:.34,strength:.36,mobileStrength:.23},
+      {node:universe.querySelector('[data-world=earth]'),start:.30,end:.57,strength:.19,mobileStrength:.13},
+      {node:universe.querySelector('[data-world=mars]'),start:.52,end:.74,strength:.30,mobileStrength:.21},
+      {node:universe.querySelector('[data-world=pluto]'),start:.68,end:1,strength:.30,mobileStrength:.20}
+    ];
+    const clamp = value => Math.max(0,Math.min(1,value));
+    const smooth = value => { const x = clamp(value); return x*x*(3-2*x); };
+    syncSpaceTravel = () => {
+      if (document.hidden || paused) return;
+      const progress = clamp(scrollY / Math.max(1,root.scrollHeight-innerHeight));
+      const still = reducedMotion.matches;
+      const travel = still ? 0 : progress * innerHeight;
+      universe.style.setProperty('--galaxy-y', `${-travel*.20}px`);
+      universe.style.setProperty('--galaxy-scale', String(still ? 1 : 1+progress*.055));
+      universe.style.setProperty('--stars-near-y', `${-travel*.30}px`);
+      universe.style.setProperty('--stars-far-y', `${-travel*.11}px`);
+      universe.style.setProperty('--debris-y', `${-travel*.08}px`);
+      encounters.forEach(({node,start,end,strength,mobileStrength}) => {
+        if (!node) return;
+        const phase = (progress-start)/(end-start);
+        const inside = phase>0 && phase<1;
+        const visibility = still ? Number(inside) : smooth(phase/.18)*(1-smooth((phase-.72)/.28));
+        node.style.opacity = String(visibility*(innerWidth<=760 ? mobileStrength : strength));
+        const center = still ? .55 : 1.05-clamp(phase)*1.2;
+        node.style.setProperty('--encounter-y', `${center*innerHeight}px`);
+      });
+    };
+    syncSpaceTravel();
+  }
 
   // No hiding of content unless IntersectionObserver is available.
   if ('IntersectionObserver' in window) {

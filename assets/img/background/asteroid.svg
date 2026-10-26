@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160">
+  <defs>
+    <linearGradient id="stone" x1=".15" y1="0" x2=".85" y2="1"><stop stop-color="#7c8494"/><stop offset=".35" stop-color="#4f586b"/><stop offset=".72" stop-color="#262d41"/><stop offset="1" stop-color="#111729"/></linearGradient>
+    <radialGradient id="crater"><stop stop-color="#131a2b"/><stop offset=".68" stop-color="#222b3f"/><stop offset=".85" stop-color="#6d7585" stop-opacity=".4"/><stop offset="1" stop-color="#465064" stop-opacity="0"/></radialGradient>
+    <clipPath id="silhouette"><path d="M30 22 67 8 109 22 140 58 147 101 119 137 71 151 29 128 10 86 14 47Z"/></clipPath>
+    <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency=".19" numOctaves="2" seed="9" result="noise"/><feColorMatrix in="noise" type="saturate" values="0"/><feBlend in="SourceGraphic" mode="soft-light"/></filter>
+  </defs>
+  <g clip-path="url(#silhouette)">
+    <path fill="url(#stone)" d="M0 0h160v160H0z"/>
+    <path fill="#a4a9b5" opacity=".17" d="m30 22 37-14-9 39-33 19-11-19Zm37-14 42 14 5 34-56-9Z"/>
+    <path fill="#070d1b" opacity=".3" d="m114 56 26 2 7 43-28 36-48 14 20-44Z"/>
+    <path fill="#7a8294" opacity=".13" d="m25 66 33-19 33 60-62 21-19-42Z"/>
+    <g fill="url(#crater)"><ellipse cx="55" cy="70" rx="19" ry="15" transform="rotate(-23 55 70)"/><ellipse cx="103" cy="93" rx="13" ry="17" transform="rotate(25 103 93)"/><ellipse cx="93" cy="40" rx="9" ry="7"/><ellipse cx="60" cy="118" rx="8" ry="6"/></g>
+    <path fill="#778192" opacity=".12" filter="url(#grain)" d="M0 0h160v160H0z"/>
+  </g>
+</svg>

@@ -196,6 +196,316 @@ a:hover {
   transform:rotate(-12deg)
 }
 
+/* Overscan lets the galaxy and star layers travel at different scroll depths. */
+.milky-way {
+  position:absolute;
+  inset:-22%;
+  background:url('../img/background/milky-way.jpg') center / cover no-repeat;
+  opacity:.26;
+  mask-image:linear-gradient(90deg,#0005,#000b 48%,#000 75%),radial-gradient(ellipse at 75% 38%,#000,transparent 85%);
+  mask-composite:intersect;
+  transform:translate3d(0,var(--galaxy-y,0px),0) scale(var(--galaxy-scale,1)) rotate(-18deg);
+  will-change:transform
+}
+
+.space-debris {
+  position:absolute;
+  inset:0;
+  transform:translate3d(0,var(--debris-y,0px),0)
+}
+
+.universe-encounters {
+  position:absolute;
+  inset:0;
+  pointer-events:none
+}
+
+.world-encounter {
+  position:absolute;
+  top:0;
+  pointer-events:none;
+  opacity:0;
+  mix-blend-mode:screen;
+  transform:translate3d(0,var(--encounter-y,120vh),0) translateY(-50%);
+  will-change:transform,opacity
+}
+
+.world-encounter img {
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  filter:saturate(.65) brightness(.88)
+}
+
+.world-saturn {
+  --world-size:clamp(680px,74vw,1180px);
+  width:var(--world-size);
+  aspect-ratio:1200/629;
+  left:calc(var(--world-size) * -.5)
+}
+
+.world-pluto {
+  --world-size:clamp(340px,43vw,640px);
+  width:var(--world-size);
+  aspect-ratio:1;
+  right:calc(var(--world-size) * -.28)
+}
+
+.world-earth {
+  --world-size:clamp(340px,44vw,620px);
+  width:var(--world-size);
+  aspect-ratio:1;
+  left:calc(50% - var(--world-size) * .5)
+}
+
+.world-earth img {
+  filter:saturate(.85) brightness(.85)
+}
+
+.world-mars {
+  --world-size:clamp(300px,35vw,500px);
+  width:var(--world-size);
+  aspect-ratio:1;
+  left:calc(var(--world-size) * -.32)
+}
+
+.world-disc {
+  width:100%;
+  height:100%;
+  border-radius:50%;
+  overflow:hidden;
+  mask-image:radial-gradient(circle,#000 65%,transparent 72%)
+}
+
+.world-pluto img {
+  object-fit:cover;
+  transform:scale(1.28)
+}
+
+/* Small, distant visitors. Exhaust is attached inside each powered craft's
+   SVG; reversing the heading reverses its trailing flame with it. */
+.space-fleet {
+  position:absolute;
+  inset:0;
+  pointer-events:none
+}
+
+.spacecraft {
+  position:absolute;
+  width:78px;
+  opacity:.4;
+  --cruise-x:90px;
+  --cruise-y:-48px;
+  --tilt:-28deg;
+  --facing:1;
+  animation:craft-cruise 26s -9s linear infinite;
+  will-change:transform
+}
+
+.craft-body {
+  display:block;
+  width:100%;
+  overflow:visible;
+  transform:rotate(var(--tilt)) scaleX(var(--facing))
+}
+
+.craft-flame {
+  transform-box:view-box;
+  transform-origin:43px 35px;
+  animation:craft-exhaust .65s ease-in-out infinite alternate
+}
+
+.craft-rocket-1 {
+  left:1.5%;
+  top:27%
+}
+
+.craft-rocket-2 {
+  right:2%;
+  top:80%;
+  width:64px;
+  --cruise-x:-110px;
+  --tilt:28deg;
+  --facing:-1;
+  animation-duration:32s;
+  animation-delay:-22s
+}
+
+.craft-satellite {
+  width:45px;
+  --tilt:22deg;
+  animation:satellite-drift 37s -14s ease-in-out infinite alternate
+}
+
+.craft-satellite-1 {
+  right:3%;
+  top:16%
+}
+
+.craft-satellite-2 {
+  left:3%;
+  top:60%;
+  width:35px;
+  --tilt:-32deg;
+  animation-duration:43s;
+  animation-delay:-31s
+}
+
+.craft-ufo {
+  width:72px;
+  --tilt:0deg;
+  --cruise-y:14px;
+  animation-duration:35s
+}
+
+.craft-ufo-1 {
+  right:2%;
+  top:43%;
+  --cruise-x:-95px;
+  --facing:-1;
+  animation-delay:-17s
+}
+
+.craft-ufo-2 {
+  left:5%;
+  top:88%;
+  width:59px;
+  animation-duration:41s;
+  animation-delay:-28s
+}
+
+@keyframes craft-cruise {
+  0% {transform:translate3d(0,0,0);opacity:0}
+  12% {opacity:.4}
+  88% {opacity:.4}
+  100% {transform:translate3d(var(--cruise-x),var(--cruise-y),0);opacity:0}
+}
+
+@keyframes satellite-drift {
+  from {transform:translate3d(0,0,0) rotate(-7deg)}
+  to {transform:translate3d(18px,-32px,0) rotate(9deg)}
+}
+
+@keyframes craft-exhaust {
+  from {transform:scaleX(.76);opacity:.65}
+  to {transform:scaleX(1.1);opacity:1}
+}
+
+.space-rock {
+  position:absolute;
+  width:var(--rock-size);
+  aspect-ratio:1;
+  background:url('../img/background/asteroid.svg') center / contain no-repeat;
+  opacity:.16;
+  transform:rotate(var(--rock-angle));
+  pointer-events:none
+}
+
+.rock-one {
+  --rock-size:96px;
+  --rock-angle:-23deg;
+  right:-22px;
+  top:18%
+}
+
+.rock-two {
+  --rock-size:50px;
+  --rock-angle:41deg;
+  left:1.7%;
+  top:62%;
+  opacity:.12
+}
+
+.rock-three {
+  --rock-size:25px;
+  --rock-angle:113deg;
+  right:3.8%;
+  top:78%;
+  opacity:.1;
+  filter:blur(.4px)
+}
+
+.rock-four {
+  --rock-size:42px;
+  --rock-angle:172deg;
+  right:1%;
+  top:49%;
+  opacity:.1
+}
+
+.rock-five {
+  --rock-size:18px;
+  --rock-angle:68deg;
+  left:3.5%;
+  top:24%;
+  opacity:.09
+}
+
+@media(max-width:760px) {
+  .milky-way {
+    opacity:.18;
+    background-size:auto 115%;
+    background-position:62% center
+  }
+
+  .world-saturn {
+    --world-size:clamp(400px,120vw,560px)
+  }
+
+  .world-pluto {
+    --world-size:clamp(220px,66vw,300px)
+  }
+
+  .world-earth {
+    --world-size:clamp(230px,72vw,360px)
+  }
+
+  .world-mars {
+    --world-size:clamp(210px,60vw,290px)
+  }
+
+  .spacecraft {
+    width:57px;
+    --cruise-x:40px;
+    --cruise-y:-25px
+  }
+
+  .craft-rocket-2,.craft-satellite-2,.craft-ufo-2 {
+    display:none
+  }
+
+  .craft-satellite {
+    width:36px
+  }
+
+  .craft-ufo-1 {
+    --cruise-x:-40px;
+    --cruise-y:8px
+  }
+
+  .rock-one {
+    --rock-size:43px;
+    right:-22px;
+    opacity:.12
+  }
+
+  .rock-two {
+    --rock-size:25px;
+    left:-11px;
+    top:68%;
+    opacity:.1
+  }
+
+  .rock-three {
+    --rock-size:14px;
+    right:-3px
+  }
+
+  .rock-four,.rock-five {
+    display:none
+  }
+}
+
 /* A circular viewport light, with transparent edges well
    inside its layer. It never inherits the solar scene's rectangular bounds. */
 .ambient-light {
@@ -232,22 +542,24 @@ html[data-motion=paused] .cursor-glow,html[data-page-hidden] .cursor-glow {
 
 .starfield {
   position:absolute;
-  inset:0;
+  inset:-35% 0;
   background-repeat:repeat
 }
 
 .stars-near {
   background-image:radial-gradient(1px 1px at 29px 53px,#cedaff8c 60%,transparent),radial-gradient(1px 1px at 179px 261px,#b9c8f05e 60%,transparent),radial-gradient(1px 1px at 337px 152px,#e8d5fd66 60%,transparent),radial-gradient(1.4px 1.4px at 473px 380px,#b7cbea5e 50%,transparent);
-  background-size:563px 481px;
+  background-size:520px 450px;
   opacity:.58;
-  animation:twinkle 9s ease-in-out infinite alternate
+  animation:twinkle 9s ease-in-out infinite alternate;
+  transform:translate3d(0,var(--stars-near-y,0px),0)
 }
 
 .stars-far {
   background-image:radial-gradient(1px 1px at 98px 120px,#909eba52 50%,transparent),radial-gradient(1px 1px at 390px 410px,#c5b6d03b 50%,transparent),radial-gradient(1px 1px at 216px 379px,#a8c8ef45 50%,transparent);
-  background-size:477px 537px;
+  background-size:450px 500px;
   opacity:.6;
-  animation:twinkle 14s -7s ease-in-out infinite alternate
+  animation:twinkle 14s -7s ease-in-out infinite alternate;
+  transform:translate3d(0,var(--stars-far-y,0px),0)
 }
 
 .star-sparkles {
@@ -290,7 +602,7 @@ html[data-motion=paused] .cursor-glow,html[data-page-hidden] .cursor-glow {
 }
 
 @media(max-width:760px) {
-  .sparkle:nth-child(n+9) {display:none}
+  .sparkle:nth-child(n+11) {display:none}
 }
 
 .shooting-star {
@@ -2544,6 +2856,18 @@ html[data-motion=paused] .cursor-glow,html[data-page-hidden] .cursor-glow {
   color:var(--dim)
 }
 
+.image-credit {
+  grid-column:1 / -1;
+  color:var(--muted);
+  font-size:10px;
+  line-height:1.7
+}
+
+.image-credit a {
+  text-decoration:underline;
+  text-underline-offset:3px
+}
+
 /* Case studies remain real pages, with native history and deep links. */
 .case-study {
   padding-top:44px;
@@ -4573,12 +4897,16 @@ html[data-motion=paused] .shooting-star {
     scroll-behavior:auto
   }
 
+  .milky-way,.stars-near,.stars-far,.space-debris {
+    transform:none
+  }
+
   *,*:before,*:after {
     animation:none!important;
     transition:none!important
   }
 
-  .shooting-star {
+  .shooting-star,.craft-flame {
     display:none
   }
 

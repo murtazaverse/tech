@@ -49,7 +49,7 @@ def header(prefix='', home=True):
 
 def footer(prefix='', home=True):
     base = '' if home else prefix + 'index.html'
-    return f'''<footer class="site-footer container"><a class="brand" href="{base}#home"><span class="brand-mark" aria-hidden="true">✳</span> murtazaverse.</a><p>A small universe. An endless curiosity.</p><a href="{base}#home">Back to Earth ↑</a><span>© 2026 {e(P['name'])}</span></footer>'''
+    return f'''<footer class="site-footer container"><a class="brand" href="{base}#home"><span class="brand-mark" aria-hidden="true">✳</span> murtazaverse.</a><p>A small universe. An endless curiosity.</p><a href="{base}#home">Back to Earth ↑</a><span>© 2026 {e(P['name'])}</span><small class="image-credit">Milky Way: <a href="https://www.eso.org/public/images/eso0932a/">ESO/S. Brunier</a> · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> · Cropped and dimmed</small></footer>'''
 
 
 def head(title, description, prefix='', page=''):
@@ -80,10 +80,33 @@ PLANETS = [
 def sparkles():
     stars = [(7,12,5.7,-2.1),(18,76,7.3,-5.4),(29,8,6.1,-.8),(36,58,8.7,-4.2),
              (45,28,4.9,-3.7),(53,86,7.9,-1.6),(61,12,6.7,-5.8),(67,52,9.1,-2.9),
-             (75,79,5.3,-4.6),(82,18,8.1,-6.3),(91,39,6.3,-1.2),(96,89,7.1,-3.4)]
+             (75,79,5.3,-4.6),(82,18,8.1,-6.3),(91,39,6.3,-1.2),(96,89,7.1,-3.4),
+             (12,43,8.4,-5.2),(57,65,6.9,-3.1),(87,61,7.7,-1.9),(40,93,9.3,-6.1)]
     return '<div class="star-sparkles">' + ''.join(
         f'<span class="sparkle" style="--x:{x}%;--y:{y}%;--sparkle-duration:{duration}s;--sparkle-delay:{delay}s"></span>'
         for x,y,duration,delay in stars) + '</div>'
+
+
+def space_worlds(prefix=''):
+    return f'''<div class="universe-encounters">
+      <div class="world-encounter world-saturn" data-world="saturn"><img src="{prefix}assets/img/background/saturn.jpg" alt="" width="1200" height="629" loading="lazy" decoding="async"></div>
+      <div class="world-encounter world-earth" data-world="earth"><div class="world-disc"><img src="{prefix}assets/img/background/earth.jpg" alt="" width="850" height="850" loading="lazy" decoding="async"></div></div>
+      <div class="world-encounter world-mars" data-world="mars"><div class="world-disc"><img src="{prefix}assets/img/background/mars.jpg" alt="" width="800" height="800" loading="lazy" decoding="async"></div></div>
+      <div class="world-encounter world-pluto" data-world="pluto"><div class="world-disc"><img src="{prefix}assets/img/background/pluto.jpg" alt="" width="1000" height="563" loading="lazy" decoding="async"></div></div>
+    </div>'''
+
+
+def space_fleet():
+    # Original vector artwork: exhaust belongs to each powered craft, so it
+    # follows its heading. Satellites have solar panels and no exhaust.
+    designs = {
+        'rocket': '''<g class="craft-flame"><path d="M42 23Q16 18 2 32Q19 46 42 41Z" fill="#efa878" opacity=".45"/><path d="M42 27Q24 25 15 32Q27 39 42 37Z" fill="#ffe0a3"/><path d="M42 30L27 32L42 34Z" fill="#f9f0d7"/></g><path d="M44 24L35 16L53 17L61 24M44 40L35 48L53 47L61 40" fill="#a594cd" stroke="#cab9ee"/><path d="M41 24Q66 15 86 32Q66 49 41 40Z" fill="#b6c4d9" stroke="#dce4ee"/><path d="M72 23Q81 26 86 32Q81 38 72 41Z" fill="#bba8f1"/><circle cx="61" cy="32" r="5" fill="#547a92" stroke="#cfedf1"/><path d="M42 26V38" stroke="#71849f" stroke-width="3"/>''',
+        'satellite': '''<g stroke="#8ca5c7" stroke-width="1.2"><path d="M9 23H33V44H9ZM63 23H87V44H63Z" fill="#345879"/><path d="M17 23V44M25 23V44M71 23V44M79 23V44M9 33H33M63 33H87" opacity=".8"/><path d="M33 33H63" stroke-width="3"/><path d="M40 22H56V45H40Z" fill="#b5bdca"/><path d="M48 22V11M43 12L48 8L53 12M48 45V54"/><path d="M56 26Q72 14 70 9Q58 6 51 20Z" fill="#9da9bb"/><path d="M65 14L74 8"/></g>''',
+        'ufo': '''<g class="craft-flame"><path d="M47 31Q20 24 1 35Q22 43 47 40Z" fill="#a38cec" opacity=".35"/><path d="M47 33L13 36L47 38Z" fill="#a9dfed" opacity=".8"/></g><path d="M51 30Q52 11 65 11Q78 11 79 30" fill="#577f96" stroke="#b5e4ea"/><path d="M38 33Q65 18 93 33Q88 45 65 45Q43 45 38 33Z" fill="#9387b2" stroke="#c4b6e4"/><path d="M39 33Q65 39 92 33" fill="none" stroke="#ded4f4"/><g fill="#bcefdc"><circle cx="52" cy="39" r="1.5"/><circle cx="65" cy="41" r="1.5"/><circle cx="78" cy="39" r="1.5"/></g>'''
+    }
+    return '<div class="space-fleet">' + ''.join(
+        f'<div class="spacecraft craft-{kind} craft-{kind}-{number}"><svg class="craft-body" viewBox="0 0 100 64" fill="none" focusable="false">{design}</svg></div>'
+        for number in (1, 2) for kind, design in designs.items()) + '</div>'
 
 
 def solar():
@@ -168,12 +191,12 @@ def build():
     title = 'Murtaza | AI & Software Engineer — Murtazaverse'
     desc = 'Explore Murtazaverse, the interactive portfolio of Murtaza, an AI and Software Engineer building AI agents, reliable backends, and data-driven products.'
     profile_schema = {'@context':'https://schema.org','@type':'Person','name':P['name'],'jobTitle':P['role'],'email':P['email'],'sameAs':[P['github'],P['linkedin']],'homeLocation':{'@type':'Place','name':P['location']}}
-    index = render('index.html',head=head(title,desc),header=header(),footer=footer(),sparkles=sparkles(),solar=solar(),experience=experience(),projects=projects(),skills=skills(),constellation=constellation(),education=education(),archived=archived,certifications=certs,email=e(P['email']),phone=e(P['phone']),phone_tel=e(P['phone'].replace(' ','')),github=e(P['github']),linkedin=e(P['linkedin']),location=e(P['location']),resume_url=e(resume_url),resume_text=e(resume_text),resume_label=e(resume_label),resume_filename='MURTAZA_ZAIDI_RESUME.pdf' if current_resume else 'MURTAZA_ZAIDI_PREVIOUS_RESUME.pdf',profile_schema=json.dumps(profile_schema).replace('<','\\u003c'))
+    index = render('index.html',head=head(title,desc),header=header(),footer=footer(),sparkles=sparkles(),fleet=space_fleet(),worlds=space_worlds(),solar=solar(),experience=experience(),projects=projects(),skills=skills(),constellation=constellation(),education=education(),archived=archived,certifications=certs,email=e(P['email']),phone=e(P['phone']),phone_tel=e(P['phone'].replace(' ','')),github=e(P['github']),linkedin=e(P['linkedin']),location=e(P['location']),resume_url=e(resume_url),resume_text=e(resume_text),resume_label=e(resume_label),resume_filename='MURTAZA_ZAIDI_RESUME.pdf' if current_resume else 'MURTAZA_ZAIDI_PREVIOUS_RESUME.pdf',profile_schema=json.dumps(profile_schema).replace('<','\\u003c'))
     (ROOT / 'index.html').write_text(index)
     for i, p in enumerate(DATA['projects']):
         next_p = DATA['projects'][(i+1) % len(DATA['projects'])]
         flow = '<ol class="architecture-flow">'+''.join('<li>'+e(x)+'</li>' for x in p['flow'])+'</ol>'
-        body = render('case-study.html',head=head(p['name']+' — Murtazaverse',p['description'],'../','projects/'+p['slug']+'.html'),header=header('../',False),footer=footer('../',False),sparkles=sparkles(),name=e(p['name']),subtitle=e(p['subtitle']),project_type=e(p['type']),status=e(p['status']),description=e(p['description']),art=art(p,True),problem=e(p['problem']),solution=e(p['solution']),contributions=''.join('<li>'+e(x)+'</li>' for x in p['contributions']),flow=flow,considerations=''.join('<li>'+e(x)+'</li>' for x in p['considerations']),outcome=e(p['outcome']),stack=tags(p['stack']),next_url=next_p['slug']+'.html',next_name=e(next_p['name']),color=p['color'],work_note='<p class="case-note">Professional work. This case study describes my contributions at a high level; internal code and implementation details are not shared.</p>' if 'Professional' in p['type'] else '')
+        body = render('case-study.html',head=head(p['name']+' — Murtazaverse',p['description'],'../','projects/'+p['slug']+'.html'),header=header('../',False),footer=footer('../',False),sparkles=sparkles(),fleet=space_fleet(),worlds=space_worlds('../'),name=e(p['name']),subtitle=e(p['subtitle']),project_type=e(p['type']),status=e(p['status']),description=e(p['description']),art=art(p,True),problem=e(p['problem']),solution=e(p['solution']),contributions=''.join('<li>'+e(x)+'</li>' for x in p['contributions']),flow=flow,considerations=''.join('<li>'+e(x)+'</li>' for x in p['considerations']),outcome=e(p['outcome']),stack=tags(p['stack']),next_url=next_p['slug']+'.html',next_name=e(next_p['name']),color=p['color'],work_note='<p class="case-note">Professional work. This case study describes my contributions at a high level; internal code and implementation details are not shared.</p>' if 'Professional' in p['type'] else '')
         (ROOT / 'projects' / (p['slug']+'.html')).write_text(body)
     domain = os.environ.get('MURTAZAVERSE_SITE_URL','').rstrip('/')
     robots = 'User-agent: *\nAllow: /\n'
