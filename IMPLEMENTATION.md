@@ -13,7 +13,7 @@ The redesign replaces the homepage and adds dedicated universe assets, while ret
 - Render important content as HTML at build time, keeping profile content in JSON. Core content and conventional navigation also work without JavaScript.
 - Use real project pages instead of modals, preserving history, deep links, and ordinary keyboard behavior.
 - Keep employer and independent projects distinct. Diagrams are conceptual and derived from the supplied descriptions; engineering considerations are framed as tradeoffs rather than unsupported implementation claims.
-- Use the retrieved older résumé only with explicit version labeling. The current PDF remains an outstanding asset.
+- Use the user-confirmed current résumé at `assets/documents/resume.pdf` for viewing and downloading, with the filename `MURTAZA_ZAIDI_RESUME.pdf`. The document-folder PDF takes priority over root-level copies.
 
 ## Design review 1: visual quality
 

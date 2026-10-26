@@ -74,23 +74,65 @@
     mobileBreakpoint.addEventListener('change', () => closeMenu());
   }
 
-  // No hiding of content unless IntersectionObserver is available.
-  if ('IntersectionObserver' in window) {
-    const sectionLinks = [...document.querySelectorAll('[data-section]')];
-    const sections = [...document.querySelectorAll('main > section[id]')];
-    const positions = new Map();
-    const setActive = id => sectionLinks.forEach(link => {
+  // Native anchors land on visible section content, below the actual header.
+  // Track the last heading to cross that same line, rather than the first of
+  // two overlapping sections inside a viewport-dependent observer band.
+  const sectionLinks = [...document.querySelectorAll('[data-section]')];
+  const navigationIds = new Set(sectionLinks.map(link => link.dataset.section));
+  const navigationSections = [...document.querySelectorAll('main > section[id]')]
+    .filter(section => navigationIds.has(section.id))
+    .map(section => ({ id: section.id, marker: section.querySelector('.section-index') || section }));
+  let navigationOffset = 112;
+  let navigationFrame = 0;
+  let activeSection = '';
+  function setActiveSection(id) {
+    if (id === activeSection) return;
+    activeSection = id;
+    sectionLinks.forEach(link => {
       if (link.dataset.section === id) link.setAttribute('aria-current', 'location');
       else link.removeAttribute('aria-current');
     });
-    const sectionObserver = new IntersectionObserver(entries => {
-      entries.forEach(entry => positions.set(entry.target.id, entry.isIntersecting));
-      const visible = sections.find(section => positions.get(section.id) && section.id !== 'about');
-      if (visible) setActive(visible.id);
-    }, { rootMargin: '-15% 0px -50% 0px', threshold: 0 });
-    sections.forEach(section => sectionObserver.observe(section));
-    setActive(document.body.classList.contains('case-page') ? 'projects' : 'home');
+  }
+  function updateNavigation() {
+    navigationFrame = 0;
+    if (!navigationSections.length) {
+      setActiveSection(document.body.classList.contains('case-page') ? 'projects' : 'home');
+      return;
+    }
+    let id = 'home';
+    for (const section of navigationSections) {
+      if (section.marker.getBoundingClientRect().top <= navigationOffset + 2) id = section.id;
+    }
+    if (scrollY > 0 && scrollY + innerHeight >= document.documentElement.scrollHeight - 2) {
+      id = navigationSections[navigationSections.length - 1].id;
+    }
+    setActiveSection(id);
+  }
+  function scheduleNavigation() {
+    if (!navigationFrame) navigationFrame = requestAnimationFrame(updateNavigation);
+  }
+  function measureNavigation() {
+    const header = document.querySelector('.site-header');
+    const inner = header?.querySelector('.header-inner');
+    if (inner) {
+      const border = parseFloat(getComputedStyle(header).borderBottomWidth) || 0;
+      navigationOffset = Math.ceil(inner.getBoundingClientRect().height + border) + 24;
+      root.style.setProperty('--navigation-offset', `${navigationOffset}px`);
+    }
+    scheduleNavigation();
+  }
+  const headerInner = document.querySelector('.header-inner');
+  if (headerInner && 'ResizeObserver' in window) new ResizeObserver(measureNavigation).observe(headerInner);
+  window.addEventListener('scroll', scheduleNavigation, { passive: true });
+  window.addEventListener('resize', measureNavigation, { passive: true });
+  window.addEventListener('hashchange', scheduleNavigation);
+  window.addEventListener('pageshow', measureNavigation);
+  document.fonts.ready.then(measureNavigation);
+  measureNavigation();
+  updateNavigation();
 
+  // No hiding of content unless IntersectionObserver is available.
+  if ('IntersectionObserver' in window) {
     const reveals = document.querySelectorAll('.reveal');
     const revealObserver = new IntersectionObserver(entries => {
       entries.forEach(entry => {

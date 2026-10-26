@@ -213,6 +213,45 @@ def run():
                     cdp.screenshot('desktop-full.png',True)
                 if width == 390:
                     cdp.screenshot('mobile-full.png',True)
+                for section_id in ('experience','projects','skills','education','contact','home'):
+                    cdp.evaluate(f"document.querySelector('[data-section={section_id}]').click()")
+                    time.sleep(.07)
+                    landing = cdp.evaluate(f"""(()=>{{
+                      const section=document.getElementById('{section_id}'),marker=section.querySelector('.section-index')||section;
+                      return {{active:document.querySelector('.desktop-nav [aria-current=location]')?.dataset.section,top:marker.getBoundingClientRect().top,header:document.querySelector('.site-header').getBoundingClientRect().bottom,scroll:scrollY,atBottom:scrollY+innerHeight>=document.documentElement.scrollHeight-2}};
+                    }})()""")
+                    check(landing['active'] == section_id, f'{section_id} click selects its own navigation dot at {width}px: {landing}')
+                    aligned = landing['scroll'] <= 2 if section_id == 'home' else landing['top'] >= landing['header'] and (abs(landing['top']-landing['header']-24)<=3 or landing['atBottom'])
+                    check(aligned, f'{section_id} click lands on visible content without an extra scroll at {width}px: {landing}')
+
+            # Exercise actual smooth anchor scrolling, in both navigation layouts.
+            cdp.call('Emulation.setEmulatedMedia',{'features':[{'name':'prefers-reduced-motion','value':'no-preference'}]})
+            settle_scroll = """new Promise(resolve=>{
+              let last=scrollY,stable=0,start=performance.now();
+              function tick(){stable=Math.abs(scrollY-last)<.5?stable+1:0;last=scrollY;if(stable>=6||performance.now()-start>2500)resolve(true);else requestAnimationFrame(tick)}
+              requestAnimationFrame(tick);
+            })"""
+            for width in (1440,390):
+                cdp.viewport(width,1000 if width>760 else 900,width<=760)
+                cdp.navigate(base)
+                for section_id in ('skills','education','projects','experience','contact','home'):
+                    if width<=760:
+                        cdp.evaluate("document.querySelector('.menu-toggle').click()")
+                    navigation = '#mobile-nav' if width<=760 else '.desktop-nav'
+                    cdp.evaluate(f"document.querySelector('{navigation} [data-section={section_id}]').click()")
+                    cdp.evaluate(settle_scroll)
+                    check(cdp.evaluate("document.querySelector('.desktop-nav [aria-current=location]')?.dataset.section") == section_id, f'Smooth {section_id} navigation finishes on the correct tab at {width}px')
+                cdp.navigate(base+'/#education')
+                cdp.evaluate(settle_scroll)
+                check(cdp.evaluate("document.querySelector('.desktop-nav [data-section=education]').getAttribute('aria-current')") == 'location', f'Direct Education links select Education without manual scrolling at {width}px')
+                cdp.screenshot(f'navigation-education-{width}.png')
+                cdp.evaluate("scrollBy({top:-150,behavior:'instant'})")
+                time.sleep(.07)
+                check(cdp.evaluate("document.querySelector('.desktop-nav [aria-current=location]')?.dataset.section") == 'skills', f'Manual upward scrolling updates the navigation dot at {width}px')
+                cdp.evaluate("scrollBy({top:150,behavior:'instant'})")
+                time.sleep(.07)
+                check(cdp.evaluate("document.querySelector('.desktop-nav [aria-current=location]')?.dataset.section") == 'education', f'Manual downward scrolling restores the Education dot at {width}px')
+            cdp.call('Emulation.setEmulatedMedia',{'features':[{'name':'prefers-reduced-motion','value':'reduce'}]})
 
             # All planets are real anchors; native click and history remain usable.
             cdp.viewport(1440)
@@ -220,8 +259,8 @@ def run():
             for kind, target in [('origin','about'),('career','experience'),('project','projects'),('tech','skills'),('academic','education'),('signal','contact')]:
                 cdp.evaluate(f"document.querySelector('.planet-{kind}').click()")
                 check(cdp.evaluate('location.hash') == '#'+target, f'{kind} planet navigates to {target}')
-                position = cdp.evaluate(f"document.getElementById('{target}').getBoundingClientRect().top")
-                check(position >= 70, f'{target} destination clears the sticky header')
+                position = cdp.evaluate(f"document.getElementById('{target}').querySelector('.section-index').getBoundingClientRect().top")
+                check(position >= 70, f'{target} content clears the sticky header')
 
             cdp.navigate(base)
             cdp.evaluate("document.getElementById('projects').scrollIntoView({behavior:'instant'})")
@@ -431,7 +470,7 @@ def run():
             check(cdp.evaluate("document.querySelector('.email-link').href === 'mailto:murtazazaidi.tech@gmail.com'"), 'Email destination matches verified profile')
             pdf = wait_http(cdp.evaluate("document.querySelector('#resume a[download]').href"))
             check(pdf.startswith(b'%PDF'), 'Résumé action serves a real PDF')
-            check(cdp.evaluate("document.querySelector('#resume a[download]').textContent.includes('previous')"), 'Earlier résumé version is clearly identified')
+            check(cdp.evaluate("document.querySelector('#resume a[download]').getAttribute('href') === 'assets/documents/resume.pdf' && document.querySelector('#resume a[download]').download === 'MURTAZA_ZAIDI_RESUME.pdf' && !document.querySelector('#resume').textContent.includes('previous')"), 'Latest document-folder résumé is linked with the current download filename')
             check(cdp.evaluate("document.querySelectorAll('canvas').length === 0"), 'All functionality runs with WebGL disabled')
             ax = cdp.call('Accessibility.getFullAXTree')['nodes']
             unnamed = [node for node in ax if not node.get('ignored') and node.get('role',{}).get('value') in ('button','link') and not node.get('name',{}).get('value','').strip()]

@@ -29,9 +29,9 @@ Generated HTML is included for ordinary static hosting. Edit the content/templat
 
 ## Résumé and remaining assets
 
-**TODO: supply the current résumé PDF.** The existing Google Drive résumé was retrieved and inspected. It predates the supplied verified profile and contains older contact details, so it is preserved as `assets/documents/resume.pdf`, explicitly labeled as an earlier version in the UI. It is not presented as the current résumé.
+The current résumé is `assets/documents/resume.pdf`. Both the PDF viewer and download action use this file. Downloads are named `MURTAZA_ZAIDI_RESUME.pdf`.
 
-Place the current PDF at `resume.pdf` or `MURTAZA_ZAIDI_RESUME.pdf` in the repository root, then rebuild. The renderer automatically uses that file, updates the labels, and enables the current résumé download filename.
+Replace `assets/documents/resume.pdf` and rebuild when updating the résumé. This document-folder file takes priority over any older copies in the repository root.
 
 Also outstanding:
 
@@ -63,7 +63,7 @@ The supplied GitHub profile and four of the six preserved certification links re
 
 No source was committed or pushed, and no remote site was published during this redesign.
 
-1. Add the current résumé and confirm any remaining optional content.
+1. Confirm the current résumé in `assets/documents/resume.pdf` and any remaining optional content.
 2. Set `MURTAZAVERSE_SITE_URL` to the real HTTPS origin when building. This adds canonical URLs, an absolute social-preview URL, a sitemap, and a sitemap reference in `robots.txt`.
 3. Run the checks above and upload the contents of `dist/` to a static host, or configure your existing host to run `python3 scripts/build.py` and serve `dist/`.
 

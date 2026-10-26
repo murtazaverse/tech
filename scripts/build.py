@@ -29,7 +29,7 @@ def tags(items):
 
 
 def resume(prefix=''):
-    for name in ('resume.pdf', 'MURTAZA_ZAIDI_RESUME.pdf'):
+    for name in ('assets/documents/resume.pdf', 'resume.pdf', 'MURTAZA_ZAIDI_RESUME.pdf'):
         if (ROOT / name).exists():
             return prefix + name, True
     return prefix + 'assets/documents/resume.pdf', False

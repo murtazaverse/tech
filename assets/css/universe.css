@@ -47,7 +47,7 @@
 
 html {
   scroll-behavior:smooth;
-  scroll-padding-top:108px
+  scroll-padding-top:var(--navigation-offset,112px)
 }
 
 body {
@@ -1041,8 +1041,9 @@ html[data-motion=paused] .cursor-glow,html[data-page-hidden] .cursor-glow {
 }
 
 .section {
-  padding-block:100px;
-  scroll-margin-top:14px
+  --section-space:100px;
+  padding-block:var(--section-space);
+  scroll-margin-top:calc(0px - var(--section-space))
 }
 
 .section-lined {
@@ -1088,7 +1089,7 @@ html[data-motion=paused] .cursor-glow,html[data-page-hidden] .cursor-glow {
   display:grid;
   grid-template-columns:1fr 1.1fr;
   gap:65px;
-  padding-block:92px
+  --section-space:92px
 }
 
 .about-section h2 {
@@ -2357,7 +2358,7 @@ html[data-motion=paused] .cursor-glow,html[data-page-hidden] .cursor-glow {
 .contact-section {
   position:relative;
   overflow:hidden;
-  padding-block:100px 70px
+  padding-block:var(--section-space) var(--contact-bottom-space,70px)
 }
 
 .contact-section>.container {
@@ -2472,7 +2473,7 @@ html[data-motion=paused] .cursor-glow,html[data-page-hidden] .cursor-glow {
   background:#0f1522b3;
   position:relative;
   z-index:2;
-  scroll-margin-top:120px
+  scroll-margin-top:0
 }
 
 .resume-panel h3 {
@@ -2747,7 +2748,7 @@ html[data-motion=paused] .cursor-glow,html[data-page-hidden] .cursor-glow {
 }
 
 .case-content section {
-  scroll-margin-top:115px;
+  scroll-margin-top:0;
   margin-bottom:48px
 }
 
@@ -2998,7 +2999,8 @@ html[data-motion=paused] .shooting-star {
   }
 
   .section {
-    padding-block:80px
+    --section-space:80px;
+    --contact-bottom-space:var(--section-space)
   }
 
   .project-bottom {
@@ -3615,7 +3617,7 @@ html[data-motion=paused] .shooting-star {
   }
 
   .section {
-    padding-block:65px
+    --section-space:65px
   }
 
   .about-section {

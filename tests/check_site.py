@@ -66,9 +66,11 @@ class SiteChecks(unittest.TestCase):
             self.assertIn(project['href'], text)
             self.assertTrue((ROOT/project['href']).is_file())
         self.assertTrue((ROOT/'assets/documents/resume.pdf').read_bytes().startswith(b'%PDF'))
-        if not (ROOT/'resume.pdf').exists() and not (ROOT/'MURTAZA_ZAIDI_RESUME.pdf').exists():
-            self.assertIn('Download previous résumé', text)
-            self.assertIn('existing PDF is an earlier version', text)
+        self.assertIn('href="assets/documents/resume.pdf"', text)
+        self.assertIn('download="MURTAZA_ZAIDI_RESUME.pdf"', text)
+        self.assertIn('Download resume', text)
+        self.assertNotIn('Download previous résumé', text)
+        self.assertNotIn('existing PDF is an earlier version', text)
 
     def test_clean_production_output(self):
         self.assertTrue((ROOT/'dist/index.html').exists())
