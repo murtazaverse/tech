@@ -1,0 +1,192 @@
+{
+  "profile": {
+    "name": "Murtaza Zaidi",
+    "display_name": "Murtaza",
+    "role": "AI Software Engineer",
+    "location": "Munich, Germany",
+    "email": "murtazazaidi.tech@gmail.com",
+    "phone": "+49 178 5536038",
+    "linkedin": "https://www.linkedin.com/in/murtazaverse",
+    "github": "https://github.com/murtazaverse",
+    "resume_fallback": "https://drive.google.com/file/d/1h9XpgrO3netlpgJZkOANO4d9DBqKPUKB/view?usp=sharing"
+  },
+  "experience": [
+    {
+      "company": "Kiresult",
+      "mark": "ki",
+      "role": "AI Software Engineer",
+      "dates": "December 2025 – Present",
+      "location": "Bonn, Germany · Remote",
+      "summary": "Building AI procurement workflows that connect useful answers with the right tools and evidence.",
+      "bullets": [
+        "Contributed to KIRA, an AI procurement assistant using LangChain and Pydantic AI, resolving 50–60% of standard analyst queries through tool calling and automated spend analysis.",
+        "Implemented JEV for model and tool routing and RAG relevance filtering. Developed specialized agents for spend analysis, vendor insights, and document retrieval across 4+ procurement workflows.",
+        "Built guardrails and evaluated tool calls, retrieval, and answer quality across 50+ test cases."
+      ],
+      "stack": ["LangChain", "Pydantic AI", "JEV", "RAG", "AI evaluation"],
+      "color": "lavender"
+    },
+    {
+      "company": "BASF",
+      "mark": "B",
+      "role": "Data Analytics & AI Trainee",
+      "dates": "March 2024 – October 2025",
+      "location": "Berlin, Germany",
+      "summary": "Making technical knowledge easier to find, structure, and evaluate.",
+      "bullets": [
+        "Reduced manual patent triage by 40% through a patent-search system using Pydantic AI, FastAPI, LangChain, MongoDB, and structured outputs.",
+        "Designed RAG components and semantic chunking to retrieve relevant patent evidence and generate structured Excel reports. Built ETL pipelines for chemical ontology and knowledge-graph data in relational databases.",
+        "Benchmarked AI models on chemical data using precision, recall, F1, and ROC-AUC."
+      ],
+      "stack": ["FastAPI", "Pydantic AI", "LangChain", "MongoDB", "ETL"],
+      "color": "cyan"
+    },
+    {
+      "company": "Udhaar App",
+      "mark": "u",
+      "role": "Python Engineer",
+      "dates": "October 2021 – September 2023",
+      "location": "Karachi, Pakistan · Y Combinator startup",
+      "summary": "Python backends for the everyday complexity of invoices, ledgers, and payments.",
+      "bullets": [
+        "Built Django/Celery services for invoicing, ledgers, and payments serving 100K+ concurrent users.",
+        "Automated risk analytics and reporting using Airflow and AWS. Improved load times by 30% through PostgreSQL and Redis optimization.",
+        "Reduced fraud by 35% by adding ML/NLP detection to KYC checks and transaction processing."
+      ],
+      "stack": ["Python", "Django", "Celery", "PostgreSQL", "Redis", "Airflow", "AWS"],
+      "color": "peach"
+    }
+  ],
+  "earlier_experience": [
+    {"company":"Xolva (Pvt.) Ltd.","role":"Trainee Engineer","dates":"June 2021 – January 2022","summary":"Built Python/Django modules for a Journals Management System, integrated existing modules, and optimized SQL queries."},
+    {"company":"The Sparks Foundation","role":"Data Science & Business Analytics Intern","dates":"July 2021 – August 2021","summary":"Hands-on machine learning and data analysis projects, alongside instructional videos explaining data science concepts."},
+    {"company":"Xolva (Pvt.) Ltd.","role":"Data Science Intern","dates":"October 2020 – November 2020","summary":"Exploratory data analysis and statistical analysis under the mentorship of senior data scientists."}
+  ],
+  "projects": [
+    {
+      "slug": "data-man",
+      "name": "Data-Man",
+      "subtitle": "Your data. A better conversation.",
+      "type": "Independent project",
+      "category": "Agentic data analytics",
+      "description": "An agentic assistant that turns natural-language questions into schema-aware SQL analysis and data transformations.",
+      "contribution": "I engineered the SQL and ETL agent workflow, schema-aware retrieval, and JEV routing and evaluation.",
+      "stack": ["Python", "LangGraph", "LangChain", "PostgreSQL", "Pandas", "TypeSafeAI JEV", "RAG", "Streamlit"],
+      "preview_stack": ["LangGraph", "PostgreSQL", "JEV"],
+      "color": "lavender",
+      "problem": "Asking a question about a database can require understanding its schema, writing SQL, and preparing the result for analysis. Data-Man explores how natural-language interaction can connect these steps.",
+      "solution": "An agentic workflow coordinates SQL analysis and ETL agents. Schema-aware RAG retrieves relevant table and column context for SQL generation. TypeSafeAI JEV supports tool-call selection, guardrail enforcement, and evaluation of routing, execution, and response quality.",
+      "contributions": ["Engineered a workflow coordinating SQL analysis and ETL agents for natural-language database queries and transformation requests.", "Implemented schema-aware RAG to retrieve relevant table and column context for SQL generation.", "Integrated TypeSafeAI JEV for tool-call selection, guardrails, and evaluation of routing decisions, tool execution, and response quality."],
+      "flow": ["Natural-language question", "Schema-aware RAG", "LangGraph orchestration", "SQL / ETL tools", "Structured response"],
+      "considerations": ["Schema context helps ground SQL generation, while retrieval relevance remains an important evaluation target.", "Coordinating specialized tools introduces routing decisions that need guardrails and evaluation alongside answer quality."],
+      "outcome": "An implemented natural-language workflow for PostgreSQL queries and requested data transformations. No quantitative benchmark is supplied.",
+      "status": "Independent build"
+    },
+    {
+      "slug": "kira",
+      "name": "KIRA",
+      "subtitle": "Procurement, with an intelligent copilot.",
+      "type": "Professional work · Kiresult",
+      "category": "AI procurement assistant",
+      "description": "Specialized agents connect spend analysis, vendor insights, and document retrieval in an AI procurement assistant.",
+      "contribution": "I contributed agent workflows, JEV routing, relevance filtering, guardrails, and evaluation.",
+      "stack": ["LangChain", "Pydantic AI", "TypeSafeAI JEV", "RAG", "Guardrails", "Evaluation"],
+      "preview_stack": ["Pydantic AI", "LangChain", "RAG"],
+      "color": "peach",
+      "problem": "Procurement analysts need answers spanning spend data, vendor information, and documents. An assistant must select valid tools and retrieve relevant evidence for different types of questions.",
+      "solution": "KIRA combines LangChain and Pydantic AI with specialized agents for spend analysis, vendor insights, and document retrieval. Model and tool routing, relevance filtering, and guardrails support those workflows.",
+      "contributions": ["Contributed to KIRA's tool calling and automated spend analysis, resolving 50–60% of standard analyst queries.", "Implemented JEV model and tool routing and RAG relevance filtering to select valid tool combinations and remove irrelevant document results.", "Developed specialized agents supporting 4+ procurement workflows and evaluated tool calls, retrieval, and answer quality across 50+ test cases."],
+      "flow": ["Analyst question", "Model & tool routing", "Specialized agents", "Tools & retrieval", "Guardrails & evaluation"],
+      "considerations": ["Specialized agents separate concerns but make tool selection and orchestration part of the reliability problem.", "Relevant evidence and valid tool calls need their own checks; fluent answers alone are insufficient."],
+      "outcome": "50–60% of standard analyst queries resolved through tool calling and automated spend analysis. Contributions supported 4+ procurement workflows, with evaluation across 50+ test cases.",
+      "status": "Professional contribution"
+    },
+    {
+      "slug": "patent-search",
+      "name": "AI Patent Search",
+      "subtitle": "Less searching. More understanding.",
+      "type": "Professional work · BASF",
+      "category": "Retrieval & knowledge systems",
+      "description": "An evidence-focused patent search system with semantic retrieval, structured outputs, and usable Excel reports.",
+      "contribution": "I built patent-search workflows, RAG components, semantic chunking, and chemical-data ETL pipelines.",
+      "stack": ["Pydantic AI", "FastAPI", "LangChain", "MongoDB", "RAG", "ETL"],
+      "preview_stack": ["FastAPI", "LangChain", "MongoDB"],
+      "color": "cyan",
+      "problem": "Manual patent triage takes time and requires finding relevant evidence in technical documents. Useful search results also need to fit an analyst's reporting workflow.",
+      "solution": "The system combines Pydantic AI, FastAPI, LangChain, MongoDB, and structured outputs. RAG components and semantic chunking retrieve relevant patent evidence and support structured Excel reports.",
+      "contributions": ["Built a patent-search system that reduced manual patent triage by 40%.", "Designed RAG components and semantic chunking for evidence retrieval and structured Excel reporting.", "Built ETL pipelines for chemical ontology and knowledge-graph data, and benchmarked models with precision, recall, F1, and ROC-AUC."],
+      "flow": ["Technical question", "Semantic retrieval", "Patent evidence", "Structured outputs", "Excel report"],
+      "considerations": ["Chunking must preserve useful technical context while keeping retrieved evidence focused.", "Structured outputs make results easier to use downstream; retrieval and model quality still require evaluation."],
+      "outcome": "40% less manual patent triage, alongside evidence retrieval, structured reporting, chemical-data ETL, and model benchmarking.",
+      "status": "Professional contribution"
+    },
+    {
+      "slug": "inference-routing",
+      "name": "LLM Inference Placement",
+      "subtitle": "The right request. The right GPU.",
+      "type": "Master’s thesis · Hasso Plattner Institute",
+      "category": "LLM systems research",
+      "description": "Ongoing research into placing LLM requests across heterogeneous GPU tiers using output-length prediction and load-aware scheduling.",
+      "contribution": "I am developing the placement layer and evaluating latency, financial cost, and energy across workloads.",
+      "stack": ["vLLM", "LLM inference", "GPU scheduling", "Output-length prediction", "Latency SLOs"],
+      "preview_stack": ["vLLM", "GPU scheduling", "LLM serving"],
+      "color": "mint",
+      "problem": "LLM requests have different compute needs. Serving them across heterogeneous GPUs raises questions about how to balance latency requirements, financial cost, and energy consumption.",
+      "solution": "I am developing an LLM inference placement layer that routes requests across heterogeneous GPU tiers. Output-length prediction and load-aware scheduling guide placement with the goal of reducing cost while meeting latency SLOs.",
+      "contributions": ["Developing an inference placement layer for heterogeneous GPU tiers.", "Using output-length prediction and load-aware scheduling to guide routing decisions.", "Evaluating tier-aware placement against single-tier and First-Come, First-Served baselines using vLLM, measuring latency, financial cost, and energy consumption."],
+      "flow": ["LLM request", "Output-length prediction", "Load-aware placement", "GPU tier / vLLM", "Latency · cost · energy"],
+      "considerations": ["Lower-cost placement must be balanced against latency SLOs and the uncertainty of output-length estimates.", "Single-tier and FCFS baselines provide reference points for evaluating tier-aware scheduling across workloads."],
+      "outcome": "Research in progress. Latency, cost, and energy are evaluation targets; completed performance results are not yet reported.",
+      "status": "Research in progress"
+    }
+  ],
+  "constellation": {
+    "groups": [
+      {"name":"Agents & retrieval","color":"lavender"},
+      {"name":"Inference & serving","color":"cyan"},
+      {"name":"Backend & data","color":"peach"},
+      {"name":"Infrastructure","color":"mint"}
+    ],
+    "nodes": [
+      {"id":"agentic-ai","name":"Agentic AI","x":27,"y":15,"color":"lavender","description":"Specialized agents, tool calling, and orchestration across Data-Man and KIRA."},
+      {"id":"langgraph","name":"LangGraph","x":10,"y":32,"color":"lavender","description":"Coordinating SQL analysis and ETL agents in Data-Man."},
+      {"id":"langchain","name":"LangChain","x":9,"y":58,"color":"lavender","description":"Agent workflows and retrieval components in Data-Man, KIRA, and patent search."},
+      {"id":"pydantic-ai","name":"Pydantic AI","x":28,"y":42,"color":"lavender","description":"Agent workflows and structured outputs in procurement and patent-search systems."},
+      {"id":"rag","name":"RAG","x":28,"y":70,"color":"lavender","description":"Retrieving relevant schema context, procurement documents, and patent evidence."},
+      {"id":"jev","name":"JEV","x":10,"y":83,"color":"lavender","description":"Tool selection, guardrail enforcement, and evaluation of routing and response quality."},
+      {"id":"inference","name":"AI inference","x":70,"y":15,"color":"cyan","description":"LLM serving research balancing request placement, latency, financial cost, and energy."},
+      {"id":"vllm","name":"vLLM","x":60,"y":37,"color":"cyan","description":"Serving engine used to evaluate heterogeneous GPU placement in my ongoing thesis."},
+      {"id":"kv-cache","name":"KV-Cache","x":88,"y":35,"color":"cyan","description":"An inference concept: reusing attention keys and values during autoregressive generation."},
+      {"id":"gpu-scheduling","name":"GPU scheduling","x":85,"y":59,"color":"cyan","description":"Load-aware placement across heterogeneous GPU tiers, evaluated against latency SLOs."},
+      {"id":"python","name":"Python","x":49,"y":53,"color":"peach","description":"Backend services, AI workflows, and data processing connect much of my engineering work."},
+      {"id":"fastapi","name":"FastAPI","x":47,"y":82,"color":"peach","description":"API development for the AI-assisted patent-search system at BASF."},
+      {"id":"postgresql","name":"PostgreSQL","x":66,"y":72,"color":"peach","description":"Natural-language database queries in Data-Man and backend optimization at Udhaar."},
+      {"id":"redis","name":"Redis","x":86,"y":85,"color":"peach","description":"Part of the PostgreSQL and Redis optimization work at Udhaar."},
+      {"id":"docker","name":"Docker","x":66,"y":93,"color":"mint","description":"Container tooling in my cloud and development stack."},
+      {"id":"airflow","name":"Airflow","x":28,"y":94,"color":"peach","description":"Automated risk analytics and reporting workflows at Udhaar."}
+    ],
+    "connections": [
+      ["agentic-ai","langgraph"], ["agentic-ai","pydantic-ai"], ["langgraph","langchain"],
+      ["langchain","rag"], ["langchain","jev"], ["pydantic-ai","python"],
+      ["pydantic-ai","rag"], ["rag","jev"], ["rag","python"],
+      ["agentic-ai","inference"], ["inference","vllm"], ["inference","kv-cache"],
+      ["vllm","kv-cache"], ["vllm","gpu-scheduling"], ["vllm","python"],
+      ["kv-cache","gpu-scheduling"], ["gpu-scheduling","docker"],
+      ["python","fastapi"], ["python","postgresql"], ["rag","postgresql"],
+      ["fastapi","postgresql"], ["postgresql","redis"], ["postgresql","airflow"],
+      ["airflow","fastapi"], ["fastapi","docker"], ["docker","redis"]
+    ]
+  },
+  "skills": [
+    {"name":"AI & LLM Engineering","color":"lavender","items":["Agentic AI","LangGraph","LangChain","Pydantic AI","JEV","RAG","Multi-Agent Systems","AI Guardrails","RAG & LLM Evaluation","AI inference","vLLM","KV-Cache","GPU scheduling"]},
+    {"name":"Backend & Languages","color":"cyan","items":["Python","SQL","TypeScript","C++","Django","FastAPI","Pydantic","Celery","Streamlit"]},
+    {"name":"Data Engineering","color":"peach","items":["PostgreSQL","MongoDB","ChromaDB","Redis","Airflow","ETL pipelines","Pandas"]},
+    {"name":"Cloud & Developer Tools","color":"mint","items":["AWS","Docker","CI/CD","Git","Linux"]},
+    {"name":"Machine Learning","color":"lavender","items":["PyTorch","Scikit-Learn","Feature Engineering","Neural Networks","Computer Vision"]}
+  ],
+  "education": [
+    {"institution":"University of Potsdam","degree":"Master’s in Data Science","grade":"1.9","logo":"assets/img/education/potsdam.jpeg"},
+    {"institution":"NED University","degree":"Bachelor’s in Computer Systems","grade":"1.5","logo":"assets/img/education/ned.jpeg"}
+  ],
+  "missing": ["Current local résumé PDF: add MURTAZA_ZAIDI_RESUME.pdf or resume.pdf at the repository root.", "Degree dates: deliberately omitted; not supplied in the verified résumé information.", "Exact thesis title and submission date: not supplied; research is presented as ongoing.", "Production domain: set MURTAZAVERSE_SITE_URL at build time for canonical, sitemap, and absolute social metadata.", "Individual project repository and demo URLs: not supplied; no speculative links are published.", "Project screenshots: not supplied; original conceptual diagrams use only the provided project descriptions."]
+}

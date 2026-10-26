@@ -1,0 +1,91 @@
+{
+  "projects": [
+    {
+      "href": "projects/dentalcavity.html",
+      "name": "Dental Cavity Detection",
+      "category": "Deep Learning"
+    },
+    {
+      "href": "projects/stockmarket.html",
+      "name": "Stock Market Prediction",
+      "category": "Deep Learning"
+    },
+    {
+      "href": "projects/generatorcph.html",
+      "name": "Generator Fuel CPH Predictor",
+      "category": "Machine Learning"
+    },
+    {
+      "href": "projects/creditcard.html",
+      "name": "Credit Card Fraud Detection",
+      "category": "Machine Learning"
+    },
+    {
+      "href": "projects/world.html",
+      "name": "CO\u2082 Emission Dashboard",
+      "category": "Data Analysis"
+    },
+    {
+      "href": "projects/imageenhancement.html",
+      "name": "Dental Image Enhancement",
+      "category": "Image Processing"
+    },
+    {
+      "href": "projects/imagemanipulation.html",
+      "name": "Image Manipulation",
+      "category": "Image Processing"
+    },
+    {
+      "href": "projects/facedetect.html",
+      "name": "Facial Feature Detection",
+      "category": "Image Processing"
+    },
+    {
+      "href": "projects/waterlevel.html",
+      "name": "Water Level Monitoring",
+      "category": "IoT & Visualization"
+    },
+    {
+      "href": "projects/universitynetwork.html",
+      "name": "University Network System",
+      "category": "Networking"
+    },
+    {
+      "href": "projects/processor.html",
+      "name": "5-Stage Pipelined Processor",
+      "category": "Computer Architecture"
+    }
+  ],
+  "certifications": [
+    {
+      "href": "https://olympus1.mygreatlearning.com/course_certificate/FUKPLZHW",
+      "name": "Statistics for Data Science",
+      "issuer": "Great Learning"
+    },
+    {
+      "href": "https://www.udemy.com/certificate/UC-b476afe5-2e71-4a2c-a9f8-98f3f405afac/",
+      "name": "Machine Learning A-Z: AI, Python & R",
+      "issuer": "Udemy"
+    },
+    {
+      "href": "https://10pearlsuniversity.org/view-certificate?cid=10PUC-1eb8475595858bddafe3843187f511bc9e74c870d3b9d42d25037781",
+      "name": "Deep Learning Essentials",
+      "issuer": "10Pearls University"
+    },
+    {
+      "href": "https://drive.google.com/file/d/1jbnDFYjQ7yfDf_sCQkFcnpnIZq280yKC/view",
+      "name": "Data Science",
+      "issuer": "Professional certificate"
+    },
+    {
+      "href": "https://www.datacamp.com/statement-of-accomplishment/course/fdc8a7e1b910fa0277321dd667ffbb6e3e45264d?raw=1",
+      "name": "Data Science Toolbox (Part 1)",
+      "issuer": "DataCamp"
+    },
+    {
+      "href": "https://www.datacamp.com/statement-of-accomplishment/course/595a9acf0702e916a0b87d7852ab5f12904ff352?raw=1",
+      "name": "Data Science Toolbox (Part 2)",
+      "issuer": "DataCamp"
+    }
+  ]
+}
