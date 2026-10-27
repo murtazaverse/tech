@@ -188,5 +188,117 @@
     {"institution":"University of Potsdam","degree":"Master’s in Data Science","grade":"1.9","logo":"assets/img/education/potsdam.jpeg"},
     {"institution":"NED University","degree":"Bachelor’s in Computer Systems","grade":"1.5","logo":"assets/img/education/ned.jpeg"}
   ],
-  "missing": ["Degree dates: deliberately omitted; not supplied in the verified résumé information.", "Exact thesis title and submission date: not supplied; research is presented as ongoing.", "Production domain: set MURTAZAVERSE_SITE_URL at build time for canonical, sitemap, and absolute social metadata.", "Individual project repository and demo URLs: not supplied; no speculative links are published.", "Project screenshots: not supplied; original conceptual diagrams use only the provided project descriptions."]
+  "missing": ["Degree dates: deliberately omitted; not supplied in the verified résumé information.", "Exact thesis title and submission date: not supplied; research is presented as ongoing.", "Production domain: set MURTAZAVERSE_SITE_URL at build time for canonical, sitemap, and absolute social metadata.", "Individual project repository and demo URLs: not supplied; no speculative links are published.", "Project screenshots: not supplied; original conceptual diagrams use only the provided project descriptions."],
+  "capabilities": {
+    "description": "I bring language models, data, and backend engineering together to build useful software — from procurement assistants and patent search to reliable fintech services.",
+    "stack": [
+      {
+        "icon": "python",
+        "name": "Python"
+      },
+      {
+        "icon": "langgraph",
+        "name": "LangGraph"
+      },
+      {
+        "icon": "langchain",
+        "name": "LangChain"
+      },
+      {
+        "icon": "pydantic",
+        "name": "Pydantic AI"
+      },
+      {
+        "icon": "fastapi",
+        "name": "FastAPI"
+      },
+      {
+        "icon": "postgresql",
+        "name": "PostgreSQL"
+      },
+      {
+        "icon": "mongodb",
+        "name": "MongoDB"
+      },
+      {
+        "icon": "pytorch",
+        "name": "PyTorch"
+      },
+      {
+        "icon": "docker",
+        "name": "Docker"
+      },
+      {
+        "icon": "git",
+        "name": "Git"
+      }
+    ],
+    "bullets": [
+      "Build agentic assistants that connect questions to the right tools, data, and evidence.",
+      "Develop Python APIs and backend services for AI products and business workflows.",
+      "Design retrieval, data pipelines, guardrails, and evaluations that make model outputs useful.",
+      "Research LLM serving and GPU placement with latency, financial cost, and energy in mind."
+    ]
+  },
+  "proficiency": [
+    {
+      "name": "AI & LLM engineering",
+      "context": "Professional work",
+      "evidence": "Agent workflows, retrieval, guardrails, and evaluation in KIRA and patent search.",
+      "tools": [
+        "LangGraph",
+        "LangChain",
+        "Pydantic AI",
+        "RAG"
+      ],
+      "color": "lavender"
+    },
+    {
+      "name": "Python & backend systems",
+      "context": "Professional work",
+      "evidence": "APIs and services for AI workflows, invoicing, ledgers, and payments.",
+      "tools": [
+        "Python",
+        "Django",
+        "FastAPI",
+        "Celery"
+      ],
+      "color": "cyan"
+    },
+    {
+      "name": "Data & machine learning",
+      "context": "Professional work",
+      "evidence": "ETL, risk analytics, model benchmarking, and ML/NLP fraud detection.",
+      "tools": [
+        "SQL",
+        "PostgreSQL",
+        "Airflow",
+        "PyTorch"
+      ],
+      "color": "peach"
+    },
+    {
+      "name": "Cloud & developer tools",
+      "context": "Applied tooling",
+      "evidence": "Automated reporting, containers, and the tools behind everyday development.",
+      "tools": [
+        "AWS",
+        "Docker",
+        "Git",
+        "Linux"
+      ],
+      "color": "mint"
+    },
+    {
+      "name": "LLM inference & scheduling",
+      "context": "Current research",
+      "evidence": "Request placement across GPU tiers in my ongoing master’s thesis.",
+      "tools": [
+        "vLLM",
+        "KV-Cache",
+        "GPU scheduling"
+      ],
+      "color": "lavender"
+    }
+  ]
 }

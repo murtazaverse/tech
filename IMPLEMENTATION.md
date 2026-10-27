@@ -28,3 +28,9 @@ Increased accomplishment and project-body text sizes, enlarged planet labels and
 Build/content checks validate IDs, heading structure, local links/assets, fragments, résumé bytes, important verified facts, and production packaging. Real Chrome tests validate the five requested viewport widths, navigation, actual keyboard/touch events, case studies and browser Back, accessible control names, reduced motion, persisted pause settings, hidden/offscreen lifecycle, and no-JavaScript/WebGL-disabled operation.
 
 Screenshots and the machine-readable browser report are generated under `artifacts/`. Browser measurements are local test observations; no Lighthouse or field performance score is claimed. The remaining limitations and deployment instructions are in `README.md`.
+
+## Illustrated portfolio sections
+
+The reference-inspired overview and proficiency sections use original inline SVG illustrations, stack logos, and content derived from the verified profile and latest résumé. Proficiency communicates professional work, applied tooling, and current research through labeled tool bars, without made-up percentage ratings. The experience cards retain all verified results; education retains the verified institutions, degrees, and grades without adding unverified dates or courses. Contact uses the existing supplied portrait and verified links.
+
+Illustrations pause offscreen and respect the shared motion control and reduced-motion preference. Planet encounters again appear progressively while scrolling, and asteroids use plain rock artwork. The icon-based skills graph, larger spacecraft population, and heart-emoji footer are retained.

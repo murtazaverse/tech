@@ -196,7 +196,7 @@ def run():
                   nodes.forEach((a,i)=>nodes.slice(i+1).forEach(b=>{if(Math.min(a.rect.right,b.rect.right)-Math.max(a.rect.left,b.rect.left)>1&&Math.min(a.rect.bottom,b.rect.bottom)-Math.max(a.rect.top,b.rect.top)>1)overlapping.push([a.name,b.name])}));
                   return {clipped,overlapping};
                 })()""")
-                check(not network['clipped'] and not network['overlapping'], f'Skill network labels fit without overlap at {width}px: {network}')
+                check(not network['clipped'] and not network['overlapping'], f'Skill network icons fit without overlap at {width}px: {network}')
                 routing_alignment = cdp.evaluate("""(()=>{
                   const art=document.querySelector('.art-inference-routing');
                   const center=selector=>{const r=art.querySelector(selector).getBoundingClientRect();return r.top+r.height/2};
@@ -213,7 +213,7 @@ def run():
                     cdp.screenshot('desktop-full.png',True)
                 if width == 390:
                     cdp.screenshot('mobile-full.png',True)
-                for section_id in ('experience','projects','skills','education','contact','home'):
+                for section_id in ('what-i-do','experience','projects','skills','education','contact','home'):
                     cdp.evaluate(f"document.querySelector('[data-section={section_id}]').click()")
                     time.sleep(.07)
                     landing = cdp.evaluate(f"""(()=>{{
@@ -268,12 +268,13 @@ def run():
                 initial = cdp.evaluate(read_space)
                 check(initial['saturn']==0 and initial['pluto']==0, f'Large planet encounters wait until scrolling starts at {width}px')
                 check(cdp.evaluate("[...document.querySelectorAll('.world-encounter img')].every(img=>img.complete&&img.naturalWidth>0)"), f'All four planet photographs load at {width}px')
+                check(cdp.evaluate("!document.querySelector('.space-debris .stack-logo')"), f'Asteroids are plain rocks again at {width}px')
                 craft_state = "[...document.querySelectorAll('.spacecraft')].filter(e=>getComputedStyle(e).display!=='none').map(e=>getComputedStyle(e).transform)"
                 craft_before = cdp.evaluate(craft_state)
                 time.sleep(.18)
                 check(cdp.evaluate(craft_state)!=craft_before, f'Spacecraft drift with decorative motion enabled at {width}px')
                 check(cdp.evaluate("[...document.querySelectorAll('.craft-satellite .craft-flame')].length===0 && [...document.querySelectorAll('.craft-rocket,.craft-ufo')].every(e=>e.querySelector('.craft-flame'))"), f'Exhaust follows rockets and UFOs while satellites have none at {width}px')
-                check(len(craft_before)==(3 if width<=760 else 6), f'Spacecraft density adapts to the viewport at {width}px')
+                check(len(craft_before)==(6 if width<=760 else 12), f'Spacecraft density adapts to the viewport at {width}px')
                 cdp.evaluate("scrollTo({top:(document.documentElement.scrollHeight-innerHeight)*.22,behavior:'instant'})")
                 time.sleep(.65)
                 first = cdp.evaluate(read_space)
@@ -313,6 +314,39 @@ def run():
                 check(cdp.evaluate("[...document.querySelectorAll('.spacecraft')].every(e=>getComputedStyle(e).animationName==='none') && [...document.querySelectorAll('.craft-flame')].every(e=>getComputedStyle(e).display==='none')"), f'Reduced motion stops craft and hides exhaust at {width}px')
                 cdp.call('Emulation.setEmulatedMedia',{'features':[{'name':'prefers-reduced-motion','value':'no-preference'}]})
             cdp.call('Emulation.setEmulatedMedia',{'features':[{'name':'prefers-reduced-motion','value':'reduce'}]})
+
+            # The reference-inspired sections remain usable across screen sizes.
+            for width in (1440,768,390,320):
+                cdp.viewport(width,1000 if width>760 else 900,width<=760)
+                cdp.navigate(base)
+                check(cdp.evaluate("[...document.querySelectorAll('.career-card,.academic-row,.proficiency-row,.contact-layout')].every(e=>e.scrollWidth<=e.clientWidth+1)"), f'New section content fits its layout at {width}px')
+                for section_id in ('what-i-do','proficiency','experience','education','contact'):
+                    cdp.evaluate(f"document.getElementById('{section_id}').scrollIntoView({{behavior:'instant'}})")
+                    time.sleep(.1)
+                    if section_id=='contact':
+                        check(cdp.evaluate("document.querySelector('.portrait-frame img').decode().then(()=>document.querySelector('.portrait-frame img').naturalWidth>0)"), f'The supplied contact portrait loads at {width}px')
+                    if width in (1440,390): cdp.screenshot(f'section-{section_id}-{width}.png')
+                check(cdp.evaluate("document.documentElement.scrollWidth<=innerWidth"), f'Illustrations, cards, and portrait create no horizontal overflow at {width}px')
+
+            cdp.viewport(1440)
+            cdp.call('Emulation.setEmulatedMedia',{'features':[{'name':'prefers-reduced-motion','value':'no-preference'}]})
+            cdp.navigate(base)
+            cdp.evaluate("document.getElementById('what-i-do').scrollIntoView({behavior:'instant'})")
+            time.sleep(.7)
+            gear_before=cdp.evaluate("getComputedStyle(document.querySelector('.illustration-gear')).transform")
+            time.sleep(.25)
+            check(cdp.evaluate("getComputedStyle(document.querySelector('.illustration-gear')).transform")!=gear_before, 'The overview illustration animates while visible')
+            cdp.evaluate("document.querySelector('.motion-toggle').click()")
+            check(cdp.evaluate("getComputedStyle(document.querySelector('.illustration-gear')).animationPlayState==='paused'"), 'The motion control pauses the new illustrations')
+            cdp.evaluate("document.querySelector('.motion-toggle').click();document.getElementById('proficiency').scrollIntoView({behavior:'instant'})")
+            time.sleep(1.1)
+            check(cdp.evaluate("[...document.querySelectorAll('.proficiency-row')].filter(e=>{const r=e.getBoundingClientRect();return r.top<innerHeight&&r.bottom>0}).every(e=>!e.classList.contains('is-waiting')&&getComputedStyle(e.querySelector('.proficiency-tools')).clipPath.includes('0px'))"), 'Proficiency tool bars reveal when scrolled into view')
+            cdp.evaluate("scrollTo({top:0,behavior:'instant'})")
+            time.sleep(.1)
+            check(cdp.evaluate("document.querySelector('.work-art').classList.contains('is-offscreen') && getComputedStyle(document.querySelector('.illustration-gear')).animationPlayState==='paused'"), 'Offscreen illustrations stop animating')
+            cdp.call('Emulation.setEmulatedMedia',{'features':[{'name':'prefers-reduced-motion','value':'reduce'}]})
+            time.sleep(.06)
+            check(cdp.evaluate("getComputedStyle(document.querySelector('.illustration-gear')).animationName==='none' && [...document.querySelectorAll('.proficiency-tools')].every(e=>getComputedStyle(e).clipPath==='none')"), 'Reduced motion disables illustration motion and shows tool bars immediately')
 
             # All planets are real anchors; native click and history remain usable.
             cdp.viewport(1440)
@@ -373,6 +407,8 @@ def run():
             check(cdp.evaluate('location.hash') == '#projects', 'Planet navigation responds to a real touch event')
 
             # Keyboard focus is visible on the actual planetary anchors.
+            cdp.viewport(1440)
+            cdp.call('Emulation.setTouchEmulationEnabled',{'enabled':False})
             cdp.navigate(base)
             cdp.evaluate("document.querySelector('.planet-project').focus()")
             check(cdp.evaluate("document.activeElement.classList.contains('planet-project') && getComputedStyle(document.activeElement).outlineStyle !== 'none'"), 'Planet keyboard focus has a visible outline')
@@ -383,6 +419,31 @@ def run():
             cdp.evaluate("document.querySelector('[data-node=kv-cache]').focus()")
             check('attention keys and values' in cdp.evaluate("document.getElementById('skill-description').textContent"), 'KV-Cache node reveals its inference context')
             check(cdp.evaluate("document.querySelector('.constellation-map line.is-active[data-to=\"kv-cache\"]') !== null && document.querySelector('[data-node=kv-cache]').getAttribute('aria-pressed') === 'true'"), 'Selected skill highlights its network connections')
+
+            check(cdp.evaluate("[...document.querySelectorAll('.constellation-node')].every(e=>e.querySelector('svg.stack-logo')&&e.getAttribute('aria-label')===e.dataset.skill)"), 'Every skill has an icon and accessible name')
+            check(cdp.evaluate("getComputedStyle(document.querySelector('[data-node=kv-cache] .skill-tooltip')).visibility==='visible'"), 'Keyboard focus reveals the skill name tooltip')
+            cdp.evaluate("document.activeElement.blur();document.querySelector('[data-node=python]').scrollIntoView({block:'center',behavior:'instant'})")
+            pos=cdp.evaluate("(()=>{const r=document.querySelector('[data-node=python]').getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2}})()")
+            cdp.call('Input.dispatchMouseEvent',{'type':'mouseMoved',**pos})
+            time.sleep(.2)
+            check(cdp.evaluate("getComputedStyle(document.querySelector('[data-node=python] .skill-tooltip')).visibility==='visible' && document.querySelector('[data-node=python] .skill-tooltip').textContent==='Python'"), 'Hovering a logo reveals its skill name')
+            check(cdp.evaluate("document.querySelector('[data-node=python]').getAttribute('aria-pressed')==='true' && document.querySelector('[data-node=kv-cache]').getAttribute('aria-pressed')==='false' && document.getElementById('skill-description').textContent.startsWith('Python')"), 'Mouse hover updates the selected skill and clears the previous tooltip on hybrid devices')
+            cdp.screenshot('skills-logo-tooltip-1440.png')
+            cdp.call('Input.dispatchMouseEvent',{'type':'mouseMoved','x':5,'y':130})
+            time.sleep(.2)
+            check(cdp.evaluate("getComputedStyle(document.querySelector('[data-node=python] .skill-tooltip')).visibility==='hidden'"), 'Skill tooltip hides when the pointer leaves')
+            cdp.viewport(390,900,True)
+            cdp.call('Emulation.setTouchEmulationEnabled',{'enabled':True})
+            cdp.navigate(base)
+            cdp.evaluate("document.querySelector('.constellation').scrollIntoView({block:'center',behavior:'instant'})")
+            pos=cdp.evaluate("(()=>{const r=document.querySelector('[data-node=python]').getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2}})()")
+            cdp.call('Input.dispatchTouchEvent',{'type':'touchStart','touchPoints':[pos]})
+            cdp.call('Input.dispatchTouchEvent',{'type':'touchEnd','touchPoints':[]})
+            time.sleep(.2)
+            check(cdp.evaluate("document.querySelector('[data-node=python]').getAttribute('aria-pressed')==='true' && getComputedStyle(document.querySelector('[data-node=python] .skill-tooltip')).visibility==='visible'"), 'Tapping a skill icon reveals its name on mobile')
+            cdp.screenshot('skills-logo-tooltip-390.png')
+            cdp.call('Emulation.setTouchEmulationEnabled',{'enabled':False})
+            check(cdp.evaluate("document.querySelector('.footer-signature').textContent==='made by murtaza with ❤️' && !document.querySelector('.image-credit')"), 'Footer shows the requested personal signature')
 
             # User control of animation, independent of system preference.
             cdp.call('Emulation.setEmulatedMedia',{'features':[{'name':'prefers-reduced-motion','value':'no-preference'}]})
@@ -549,7 +610,7 @@ def run():
             cdp.call('Emulation.setScriptExecutionDisabled',{'value':True})
             cdp.navigate(base)
             check(cdp.evaluate("document.querySelector('h1').getBoundingClientRect().height > 0"), 'Professional introduction is visible without JavaScript')
-            check(cdp.evaluate("document.querySelectorAll('.nojs-nav a').length === 6 && document.querySelector('.nojs-nav').getBoundingClientRect().height > 0"), 'Conventional mobile navigation works without JavaScript')
+            check(cdp.evaluate("document.querySelectorAll('.nojs-nav a').length === 7 && document.querySelector('.nojs-nav').getBoundingClientRect().height > 0"), 'Conventional mobile navigation works without JavaScript')
             check(cdp.evaluate("[...document.querySelectorAll('.project-card')].every(e=>getComputedStyle(e).opacity === '1')"), 'All project content remains visible without JavaScript')
             cdp.call('Emulation.setScriptExecutionDisabled',{'value':False})
             cdp.navigate(base)

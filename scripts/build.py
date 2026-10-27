@@ -37,7 +37,7 @@ def resume(prefix=''):
 
 def header(prefix='', home=True):
     base = '' if home else prefix + 'index.html'
-    nav = ''.join(f'<a href="{base}#{slug}" data-section="{slug}">{label}</a>' for slug, label in [('home','Home'),('experience','Experience'),('projects','Projects'),('skills','Skills'),('education','Education'),('contact','Contact')])
+    nav = ''.join(f'<a href="{base}#{slug}" data-section="{slug}">{label}</a>' for slug, label in [('home','Home'),('what-i-do','What I do'),('experience','Experience'),('projects','Projects'),('skills','Skills'),('education','Education'),('contact','Contact')])
     return f'''<a class="skip-link" href="#main">Skip to content</a>
     <header class="site-header"><div class="container header-inner">
       <a class="brand" href="{base}#home" aria-label="Murtazaverse home"><span class="brand-mark" aria-hidden="true">✳</span> murtazaverse<span class="brand-period">.</span></a>
@@ -49,7 +49,7 @@ def header(prefix='', home=True):
 
 def footer(prefix='', home=True):
     base = '' if home else prefix + 'index.html'
-    return f'''<footer class="site-footer container"><a class="brand" href="{base}#home"><span class="brand-mark" aria-hidden="true">✳</span> murtazaverse.</a><p>A small universe. An endless curiosity.</p><a href="{base}#home">Back to Earth ↑</a><span>© 2026 {e(P['name'])}</span><small class="image-credit">Milky Way: <a href="https://www.eso.org/public/images/eso0932a/">ESO/S. Brunier</a> · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> · Cropped and dimmed</small></footer>'''
+    return f'''<footer class="site-footer container"><a class="brand" href="{base}#home"><span class="brand-mark" aria-hidden="true">✳</span> murtazaverse.</a><p>A small universe. An endless curiosity.</p><a href="{base}#home">Back to Earth ↑</a><span>© 2026 {e(P['name'])}</span><small class="footer-signature">made by murtaza with <span class="signature-heart">❤️</span></small></footer>'''
 
 
 def head(title, description, prefix='', page=''):
@@ -81,7 +81,10 @@ def sparkles():
     stars = [(7,12,5.7,-2.1),(18,76,7.3,-5.4),(29,8,6.1,-.8),(36,58,8.7,-4.2),
              (45,28,4.9,-3.7),(53,86,7.9,-1.6),(61,12,6.7,-5.8),(67,52,9.1,-2.9),
              (75,79,5.3,-4.6),(82,18,8.1,-6.3),(91,39,6.3,-1.2),(96,89,7.1,-3.4),
-             (12,43,8.4,-5.2),(57,65,6.9,-3.1),(87,61,7.7,-1.9),(40,93,9.3,-6.1)]
+             (12,43,8.4,-5.2),(57,65,6.9,-3.1),(87,61,7.7,-1.9),(40,93,9.3,-6.1),
+             (3,72,6.3,-3.2),(22,26,8.2,-4.7),(34,39,7.2,-1.1),(47,71,5.9,-2.8),
+             (64,91,9.2,-7.1),(72,33,6.7,-4.3),(94,7,7.5,-2.6),(15,92,8.6,-5.2),
+             (31,69,7.8,-3.8),(58,38,6.4,-5.1),(79,94,8.8,-1.8),(89,77,5.8,-4.5)]
     return '<div class="star-sparkles">' + ''.join(
         f'<span class="sparkle" style="--x:{x}%;--y:{y}%;--sparkle-duration:{duration}s;--sparkle-delay:{delay}s"></span>'
         for x,y,duration,delay in stars) + '</div>'
@@ -89,11 +92,27 @@ def sparkles():
 
 def space_worlds(prefix=''):
     return f'''<div class="universe-encounters">
-      <div class="world-encounter world-saturn" data-world="saturn"><img src="{prefix}assets/img/background/saturn.jpg" alt="" width="1200" height="629" loading="lazy" decoding="async"></div>
-      <div class="world-encounter world-earth" data-world="earth"><div class="world-disc"><img src="{prefix}assets/img/background/earth.jpg" alt="" width="850" height="850" loading="lazy" decoding="async"></div></div>
-      <div class="world-encounter world-mars" data-world="mars"><div class="world-disc"><img src="{prefix}assets/img/background/mars.jpg" alt="" width="800" height="800" loading="lazy" decoding="async"></div></div>
-      <div class="world-encounter world-pluto" data-world="pluto"><div class="world-disc"><img src="{prefix}assets/img/background/pluto.jpg" alt="" width="1000" height="563" loading="lazy" decoding="async"></div></div>
+      <div class="world-encounter world-saturn" data-world="saturn"><img src="{prefix}assets/img/background/saturn.jpg" alt="" width="1200" height="629" decoding="async"></div>
+      <div class="world-encounter world-earth" data-world="earth"><div class="world-disc"><img src="{prefix}assets/img/background/earth.jpg" alt="" width="850" height="850" decoding="async"></div></div>
+      <div class="world-encounter world-mars" data-world="mars"><div class="world-disc"><img src="{prefix}assets/img/background/mars.jpg" alt="" width="800" height="800" decoding="async"></div></div>
+      <div class="world-encounter world-pluto" data-world="pluto"><div class="world-disc"><img src="{prefix}assets/img/background/pluto.jpg" alt="" width="1000" height="563" decoding="async"></div></div>
     </div>'''
+
+
+def stack_logo(slug):
+    svg = (ROOT / 'assets/img/stack' / f'{slug}.svg').read_text().strip()
+    return svg.replace('<svg ', '<svg class="stack-logo" aria-hidden="true" focusable="false" ', 1)
+
+
+def space_debris():
+    rocks = [(2,18,76,-18),(91,27,72,21),(5,43,60,-12),(88,57,64,15),
+             (3,71,74,12),(92,82,76,-15),(20,91,58,14),(78,12,54,-20),
+             (40,8,48,18),(62,88,55,-8),(84,39,62,15),(13,57,58,-16),
+             (34,78,46,12),(72,68,48,-11),(46,95,44,9),(55,23,48,-12),
+             (26,35,43,18),(66,48,49,-10),(17,8,43,13),(95,5,50,-15)]
+    return '<div class="space-debris">' + ''.join(
+        f'<span class="space-rock" style="--rock-x:{x}%;--rock-y:{y}%;--rock-size:{size}px;--rock-angle:{angle}deg"></span>'
+        for x,y,size,angle in rocks) + '</div>'
 
 
 def space_fleet():
@@ -106,7 +125,7 @@ def space_fleet():
     }
     return '<div class="space-fleet">' + ''.join(
         f'<div class="spacecraft craft-{kind} craft-{kind}-{number}"><svg class="craft-body" viewBox="0 0 100 64" fill="none" focusable="false">{design}</svg></div>'
-        for number in (1, 2) for kind, design in designs.items()) + '</div>'
+        for number in (1, 2, 3, 4) for kind, design in designs.items()) + '</div>'
 
 
 def solar():
@@ -131,7 +150,7 @@ def solar():
 def experience():
     out = []
     for i, item in enumerate(DATA['experience']):
-        out.append(f'''<article class="experience-card {item['color']} reveal"><div class="experience-meta"><div class="company-line"><span class="company-mark" aria-hidden="true">{e(item['mark'])}</span><h3>{e(item['company'])}</h3>{'<span class="current-badge">Current orbit</span>' if i == 0 else ''}</div><p class="job-date">{e(item['dates'])}</p><p class="job-location">{e(item['location'])}</p></div><div class="experience-body"><h4>{e(item['role'])}</h4><p>{e(item['summary'])}</p><ul class="achievements">{''.join('<li>'+e(b)+'</li>' for b in item['bullets'])}</ul>{tags(item['stack'])}</div></article>''')
+        out.append(f'''<article class="experience-card career-card {item['color']} reveal"><div class="company-banner"><h3>{e(item['company'])}</h3>{'<span class="current-badge">Current orbit</span>' if i == 0 else ''}<span class="company-mark" aria-hidden="true">{e(item['mark'])}</span></div><div class="experience-body"><h4>{e(item['role'])}</h4><p class="job-date">{e(item['dates'])}</p><p class="job-location">{e(item['location'])}</p><p class="job-summary">{e(item['summary'])}</p><ul class="achievements">{''.join('<li>'+e(b)+'</li>' for b in item['bullets'])}</ul>{tags(item['stack'])}</div></article>''')
     earlier = ''.join(f'<article><h4>{e(x["role"])} · {e(x["company"])}</h4><p class="mono">{e(x["dates"])}</p><p>{e(x["summary"])}</p></article>' for x in DATA['earlier_experience'])
     return ''.join(out) + f'<details class="archive"><summary>Earlier chapters <span>Internships & early engineering experience +</span></summary><div class="earlier-grid">{earlier}</div></details>'
 
@@ -157,6 +176,20 @@ def skills():
     return ''.join(f'<article class="skill-card {x["color"]}"><h3><span class="skill-dot" aria-hidden="true"></span>{e(x["name"])}</h3>{tags(x["items"])}</article>' for x in DATA['skills'])
 
 
+def capabilities():
+    data = DATA['capabilities']
+    logos = ''.join(f'<li>{stack_logo(x["icon"])}<span>{e(x["name"])}</span></li>' for x in data['stack'])
+    bullets = ''.join(f'<li><span aria-hidden="true">↗</span>{e(x)}</li>' for x in data['bullets'])
+    illustration = (ROOT/'templates/illustrations/what-i-do.svg').read_text()
+    return f'''<div class="capabilities-layout"><div class="section-art work-art reveal" data-illustration>{illustration}</div><div class="capabilities-copy reveal"><p class="capabilities-intro">{e(data['description'])}</p><ul class="capability-logos" aria-label="Tools I work with">{logos}</ul><ul class="capability-list">{bullets}</ul><a class="text-link" href="#proficiency">Explore my proficiency <span aria-hidden="true">↓</span></a></div></div>'''
+
+
+def proficiency():
+    rows = ''.join(f'''<article class="proficiency-row {e(x['color'])} reveal"><div class="proficiency-label"><h3>{e(x['name'])}</h3><span>{e(x['context'])}</span></div><p>{e(x['evidence'])}</p><ul class="proficiency-tools" aria-label="{e(x['name'])} tools">{''.join('<li>'+e(t)+'</li>' for t in x['tools'])}</ul></article>''' for x in DATA['proficiency'])
+    illustration = (ROOT/'templates/illustrations/proficiency.svg').read_text()
+    return f'<div class="proficiency-layout"><div class="proficiency-rows">{rows}</div><div class="section-art proficiency-art reveal" data-illustration>{illustration}<p class="mono">LEARN. BUILD. EVALUATE. REPEAT.</p></div></div>'
+
+
 def constellation():
     graph = DATA['constellation']
     nodes = {node['id']: node for node in graph['nodes']}
@@ -167,14 +200,17 @@ def constellation():
     for source, target in graph['connections']:
         start, end = nodes[source], nodes[target]
         lines.append(f'<line data-from="{e(source)}" data-to="{e(target)}" x1="{start["x"]}" y1="{start["y"]}" x2="{end["x"]}" y2="{end["y"]}"/>')
+    icons = {'agentic-ai':'agents','pydantic-ai':'pydantic','rag':'rag','jev':'guardrails',
+             'inference':'inference','vllm':'serving','kv-cache':'cache',
+             'gpu-scheduling':'gpu','airflow':'apacheairflow'}
     buttons = ''.join(
-        f'<button class="constellation-node {e(node["color"])}" type="button" style="--x:{node["x"]}%;--y:{node["y"]}%" data-node="{e(node["id"])}" data-skill="{e(node["name"])}" data-description="{e(node["description"])}" aria-describedby="skill-description"><span aria-hidden="true"></span>{e(node["name"])}</button>'
+        f'<button class="constellation-node {e(node["color"])}" type="button" style="--x:{node["x"]}%;--y:{node["y"]}%" data-node="{e(node["id"])}" data-skill="{e(node["name"])}" data-description="{e(node["description"])}" aria-label="{e(node["name"])}" aria-describedby="skill-description">{stack_logo(icons.get(node["id"],node["id"]))}<span class="skill-tooltip" aria-hidden="true">{e(node["name"])}</span></button>'
         for node in nodes.values())
     return f'<div class="constellation">{legend}<div class="constellation-map"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">{"".join(lines)}</svg>{buttons}</div><p id="skill-description" aria-live="polite">Select a star to explore the ideas and tools behind my work.</p></div>'
 
 
 def education():
-    return ''.join(f'<article class="education-card reveal"><img src="{e(x["logo"])}" alt="" width="48" height="48" loading="lazy"><div><p class="mono">{e(x["institution"])}</p><h3>{e(x["degree"])}</h3><p class="grade">GPA <strong>{e(x["grade"])}</strong> · German grading scale</p></div></article>' for x in DATA['education'])
+    return ''.join(f'<article class="education-card academic-row reveal"><div class="institution-seal"><img src="{e(x["logo"])}" alt="" width="72" height="72" loading="lazy"></div><div><p class="mono">{"POSTGRADUATE STUDY" if i == 0 else "UNDERGRADUATE STUDY"}</p><h3>{e(x["institution"])}</h3><p class="education-degree">{e(x["degree"])}</p><p class="grade">GPA <strong>{e(x["grade"])}</strong> · German grading scale</p></div></article>' for i,x in enumerate(DATA['education']))
 
 
 def archive():
@@ -191,12 +227,12 @@ def build():
     title = 'Murtaza | AI & Software Engineer — Murtazaverse'
     desc = 'Explore Murtazaverse, the interactive portfolio of Murtaza, an AI and Software Engineer building AI agents, reliable backends, and data-driven products.'
     profile_schema = {'@context':'https://schema.org','@type':'Person','name':P['name'],'jobTitle':P['role'],'email':P['email'],'sameAs':[P['github'],P['linkedin']],'homeLocation':{'@type':'Place','name':P['location']}}
-    index = render('index.html',head=head(title,desc),header=header(),footer=footer(),sparkles=sparkles(),fleet=space_fleet(),worlds=space_worlds(),solar=solar(),experience=experience(),projects=projects(),skills=skills(),constellation=constellation(),education=education(),archived=archived,certifications=certs,email=e(P['email']),phone=e(P['phone']),phone_tel=e(P['phone'].replace(' ','')),github=e(P['github']),linkedin=e(P['linkedin']),location=e(P['location']),resume_url=e(resume_url),resume_text=e(resume_text),resume_label=e(resume_label),resume_filename='MURTAZA_ZAIDI_RESUME.pdf' if current_resume else 'MURTAZA_ZAIDI_PREVIOUS_RESUME.pdf',profile_schema=json.dumps(profile_schema).replace('<','\\u003c'))
+    index = render('index.html',head=head(title,desc),header=header(),footer=footer(),sparkles=sparkles(),debris=space_debris(),fleet=space_fleet(),worlds=space_worlds(),solar=solar(),experience=experience(),projects=projects(),skills=skills(),constellation=constellation(),capabilities=capabilities(),proficiency=proficiency(),github_logo=stack_logo("github"),education=education(),archived=archived,certifications=certs,email=e(P['email']),phone=e(P['phone']),phone_tel=e(P['phone'].replace(' ','')),github=e(P['github']),linkedin=e(P['linkedin']),location=e(P['location']),resume_url=e(resume_url),resume_text=e(resume_text),resume_label=e(resume_label),resume_filename='MURTAZA_ZAIDI_RESUME.pdf' if current_resume else 'MURTAZA_ZAIDI_PREVIOUS_RESUME.pdf',profile_schema=json.dumps(profile_schema).replace('<','\\u003c'))
     (ROOT / 'index.html').write_text(index)
     for i, p in enumerate(DATA['projects']):
         next_p = DATA['projects'][(i+1) % len(DATA['projects'])]
         flow = '<ol class="architecture-flow">'+''.join('<li>'+e(x)+'</li>' for x in p['flow'])+'</ol>'
-        body = render('case-study.html',head=head(p['name']+' — Murtazaverse',p['description'],'../','projects/'+p['slug']+'.html'),header=header('../',False),footer=footer('../',False),sparkles=sparkles(),fleet=space_fleet(),worlds=space_worlds('../'),name=e(p['name']),subtitle=e(p['subtitle']),project_type=e(p['type']),status=e(p['status']),description=e(p['description']),art=art(p,True),problem=e(p['problem']),solution=e(p['solution']),contributions=''.join('<li>'+e(x)+'</li>' for x in p['contributions']),flow=flow,considerations=''.join('<li>'+e(x)+'</li>' for x in p['considerations']),outcome=e(p['outcome']),stack=tags(p['stack']),next_url=next_p['slug']+'.html',next_name=e(next_p['name']),color=p['color'],work_note='<p class="case-note">Professional work. This case study describes my contributions at a high level; internal code and implementation details are not shared.</p>' if 'Professional' in p['type'] else '')
+        body = render('case-study.html',head=head(p['name']+' — Murtazaverse',p['description'],'../','projects/'+p['slug']+'.html'),header=header('../',False),footer=footer('../',False),sparkles=sparkles(),debris=space_debris(),fleet=space_fleet(),worlds=space_worlds('../'),name=e(p['name']),subtitle=e(p['subtitle']),project_type=e(p['type']),status=e(p['status']),description=e(p['description']),art=art(p,True),problem=e(p['problem']),solution=e(p['solution']),contributions=''.join('<li>'+e(x)+'</li>' for x in p['contributions']),flow=flow,considerations=''.join('<li>'+e(x)+'</li>' for x in p['considerations']),outcome=e(p['outcome']),stack=tags(p['stack']),next_url=next_p['slug']+'.html',next_name=e(next_p['name']),color=p['color'],work_note='<p class="case-note">Professional work. This case study describes my contributions at a high level; internal code and implementation details are not shared.</p>' if 'Professional' in p['type'] else '')
         (ROOT / 'projects' / (p['slug']+'.html')).write_text(body)
     domain = os.environ.get('MURTAZAVERSE_SITE_URL','').rstrip('/')
     robots = 'User-agent: *\nAllow: /\n'

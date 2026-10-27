@@ -3,7 +3,6 @@
   'use strict';
   const root = document.documentElement;
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-  const finePointer = matchMedia('(hover: hover) and (pointer: fine)');
   const motionButton = document.querySelector('.motion-toggle');
   let paused = false;
   let syncOrbit = () => {};
@@ -185,6 +184,11 @@
       revealObserver.observe(element);
     });
     root.classList.add('motion-ready');
+    const illustrations = document.querySelectorAll('[data-illustration]');
+    const illustrationObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => entry.target.classList.toggle('is-offscreen', !entry.isIntersecting));
+    }, { rootMargin: '80px' });
+    illustrations.forEach(illustration => illustrationObserver.observe(illustration));
     const solar = document.querySelector('.solar');
     if (solar) {
       const sceneObserver = new IntersectionObserver(entries => {
@@ -407,16 +411,23 @@
   const skillConnections = [...document.querySelectorAll('.constellation-map line')];
   skillNodes.forEach(node => {
     node.setAttribute('aria-pressed', 'false');
-    function select() {
-      skillNodes.forEach(other => other.setAttribute('aria-pressed', String(other === node)));
+    let pointerType = '';
+    function select(touchLabel = false) {
+      skillNodes.forEach(other => {
+        other.setAttribute('aria-pressed', String(other === node));
+        other.toggleAttribute('data-touch-label', touchLabel && other === node);
+      });
       skillConnections.forEach(connection => {
         connection.classList.toggle('is-active', connection.dataset.from === node.dataset.node || connection.dataset.to === node.dataset.node);
       });
       if (description) description.textContent = `${node.dataset.skill} — ${node.dataset.description}`;
     }
-    node.addEventListener('click', select);
-    node.addEventListener('focus', select);
-    node.addEventListener('pointerenter', () => { if (finePointer.matches) select(); });
+    node.addEventListener('pointerdown', event => { pointerType = event.pointerType; });
+    node.addEventListener('click', event => select((event.pointerType || pointerType) === 'touch'));
+    node.addEventListener('focus', () => select());
+    node.addEventListener('pointerenter', event => {
+      if (event.pointerType === 'mouse') select();
+    });
   });
 
   // Close the mobile disclosure when traversing native browser history.
